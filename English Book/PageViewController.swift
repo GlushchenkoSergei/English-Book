@@ -12,17 +12,15 @@ class PageViewController: UIViewController {
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     let testText = """
-Инкапсуляция (англ. encapsulation, от лат. in capsula) — в информатике, процесс разделения элементов абстракций, определяющих ее структуру (данные) и поведение (методы); инкапсуляция предназначена для изоляции контрактных обязательств абстракции (протокол/интерфейс) от их реализации. На практике это означает, что класс должен состоять из двух частей: интерфейса и реализации. В реализации большинства языков программирования (C++, C#, Java и другие) обеспечивается механизм сокрытия, позволяющий разграничивать доступ к различным частям компонента.
-
-Инкапсуляция зачастую рассматривается как понятие, присущее исключительно объектно-ориентированному программированию (ООП), но в действительности обширно встречается и в других (см. подтипизация на записях и полиморфизм записей и вариантов). В ООП инкапсуляция тесно связана с принципом абстракции данных (не путать с абстрактными типами данных, реализации которых предоставляют возможность инкапсуляции, но имеют иную природу). Это, в частности, влечёт за собой различия в терминологии в разных источниках. В сообществе C++ или Java принято рассматривать инкапсуляцию без сокрытия как неполноценную. Однако, некоторые языки (например, Smalltalk, Python) реализуют инкапсуляцию, но не предусматривают возможности сокрытия в принципе. Другие (Standard ML, OCaml) жёстко разделяют эти понятия как ортогональные и предоставляют их в семантически различном виде (см. сокрытие в языке модулей ML).
+Writing about oneself and personal experiences — and then rewriting your story — can lead to behavioral changes and improve happiness. (We already know that expressive writing can improve mood disorders and help reduce symptoms among cancer patients, among other health benefits.)
+Some research suggests that writing in a personal journal for 15 minutes a day can lead to a boost in overall happiness and well-being, in part because it allows us to express our emotions, be mindful of our circumstances and resolve inner conflicts. Or you can take the next step and focus on one particular challenge you face, and write and rewrite that story.
+We all have a personal narrative that shapes our view of the world and ourselves. But sometimes our inner voice doesn’t get it right. By writing and then editing our own stories, we can change our perceptions of ourselves and identify obstacles that stand in the way of our personal well-being. The process is similar to Socratic questioning (referenced above). Here’s a writing exercise:
 """
     
-    let oneLine: [String] = ["процесс ", "разделения ", "элементов ", "абстракций, "]
+    var value = 0
+    var counterOneLine = 0
     
-    
-   lazy var componentsOfText = divisionIntoParts(this: testText)
-    
-    let testWord = "как"
+    private var componentsOfText: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,33 +30,28 @@ class PageViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         
-//        let componentsOfText = divisionIntoParts(this: testText)
-//        print(componentsOfText)
-//        print("________")
-        
-        print(countCharactersOf(this: oneLine))
-        let mergeText = mergePartsText(components: componentsOfText)
-//        print(mergeText)
+        componentsOfText = divisionIntoParts(this: testText)
+        addingSpacerForLine(array: componentsOfText)
     }
     
-    private func countCharactersOf(this array: [String]) -> Int {
-        var count = 0
-        
-        for x in array {
-            count += x.count
+    private func addingSpacerForLine(array: [String]) {
+    
+        for index in 0...componentsOfText.count - 1{
+            
+            value += componentsOfText[index].count
+            
+            if value > 36 {
+                let x = 36 - counterOneLine
+                for _ in 0...x {
+                    componentsOfText[index - 1] += " "
+                    print("добавил пробелы index \(index - 1)")
+                }
+                counterOneLine = 0
+                value = componentsOfText[index].count
+            }
+            counterOneLine += componentsOfText[index].count
         }
-        return count
     }
-    
-    
-    private func mergePartsText(components: [String]) -> String {
-        var text = ""
-        for part in components {
-            text += part
-        }
-        return text
-    }
-    
     
     private func divisionIntoParts(this text: String) -> [String] {
         var components: [String] = []
@@ -68,7 +61,6 @@ class PageViewController: UIViewController {
         return components
     }
     
- 
 }
 
 extension PageViewController: UICollectionViewDataSource, UICollectionViewDelegate {
@@ -85,7 +77,8 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(componentsOfText[indexPath.row])
+        print("индекс - [\(indexPath.row)]")
+        print("символов \(componentsOfText[indexPath.row].count)")
     }
     
 }
@@ -95,7 +88,6 @@ extension PageViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
-    
     
     //расстояние между горизонтальными секциями
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -107,70 +99,73 @@ extension PageViewController: UICollectionViewDelegateFlowLayout {
         return 0
     }
     
-    private func currentCounterCharacter(indexPath: IndexPath) {
-        
-    }
-    
-    
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let numberCharacterOfLine = 41
-        var counter = 0
-        
-        if
-            
-        counter += indexPath.row
-        
-        
-        
-        
-        
-        
         if componentsOfText[indexPath.row].count < 3 {
-            return CGSize(width: (view.frame.size.width / 30) , height: 30)
+            return CGSize(width: (view.frame.size.width / 28) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 4 {
-            return CGSize(width: (view.frame.size.width / 13) , height: 30)
+            return CGSize(width: (view.frame.size.width / 14) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 5 {
-            return CGSize(width: (view.frame.size.width / 10) , height: 30)
+            return CGSize(width: (view.frame.size.width / 9.5) , height: 30)
+            
+        } else if componentsOfText[indexPath.row].count < 6 {
+            return CGSize(width: (view.frame.size.width / 7.6) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 7 {
-            return CGSize(width: (view.frame.size.width / 7) , height: 30)
+            return CGSize(width: (view.frame.size.width / 6.5) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 8 {
-            return CGSize(width: (view.frame.size.width / 6) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 9 {
             return CGSize(width: (view.frame.size.width / 5) , height: 30)
             
+        } else if componentsOfText[indexPath.row].count < 9 {
+            return CGSize(width: (view.frame.size.width / 4.8) , height: 30)
+            
         } else if componentsOfText[indexPath.row].count < 10 {
-            return CGSize(width: (view.frame.size.width / 4.4) , height: 30)
+            return CGSize(width: (view.frame.size.width / 4.6) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 11 {
-            return CGSize(width: (view.frame.size.width / 4.25) , height: 30)
+            return CGSize(width: (view.frame.size.width / 4) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 12 {
-            return CGSize(width: (view.frame.size.width / 3.9) , height: 30)
+            return CGSize(width: (view.frame.size.width / 3.6) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 13 {
-            return CGSize(width: (view.frame.size.width / 3.4) , height: 30)
+            return CGSize(width: (view.frame.size.width / 3) , height: 30)
+            
+        } else if componentsOfText[indexPath.row].count < 14 {
+            return CGSize(width: (view.frame.size.width / 2.8) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 15 {
-            return CGSize(width: (view.frame.size.width / 3.1) , height: 30)
+            return CGSize(width: (view.frame.size.width / 2.7) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 16 {
             return CGSize(width: (view.frame.size.width / 2.9) , height: 30)
             
         } else if componentsOfText[indexPath.row].count < 18 {
             return CGSize(width: (view.frame.size.width / 2.4) , height: 30)
-        
+            
         } else if componentsOfText[indexPath.row].count < 19 {
-            return CGSize(width: (view.frame.size.width / 2.2) , height: 30)
+            return CGSize(width: (view.frame.size.width / 2.3) , height: 30)
+            
+        } else if componentsOfText[indexPath.row].count < 20 {
+            return CGSize(width: (view.frame.size.width / 2.1) , height: 30)
+            
+        } else if componentsOfText[indexPath.row].count < 21 {
+            return CGSize(width: (view.frame.size.width / 2.0) , height: 30)
+            
+        } else if componentsOfText[indexPath.row].count < 22 {
+            return CGSize(width: (view.frame.size.width / 2.0) , height: 30)
+            
+        } else if componentsOfText[indexPath.row].count < 23 {
+            return CGSize(width: (view.frame.size.width / 2.0) , height: 30)
+            
+        } else if componentsOfText[indexPath.row].count < 32 {
+            return CGSize(width: (view.frame.size.width / 2) , height: 30)
         }
         
-        return CGSize(width: (view.frame.size.width / 1) , height: 30)
+        return CGSize(width: (view.frame.size.width / 1.5) , height: 30)
     }
 }
 

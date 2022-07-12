@@ -14,12 +14,13 @@ class WordCollectionViewCell: UICollectionViewCell {
    private let textLabel: UILabel = {
        let label = UILabel()
         label.text = "text"
+       label.font = UIFont.monospacedSystemFont(ofSize: 17, weight: .black)
+//       label.font = UIFont.monospacedDigitSystemFont(ofSize: 17, weight: .heavy)
         return label
     }()
     
     override init(frame: CGRect) {
         super .init(frame: frame)
-//        textLabel.textColor = .red
         contentView.addSubview(textLabel)
     }
     
@@ -35,11 +36,5 @@ class WordCollectionViewCell: UICollectionViewCell {
         super.layoutSubviews()
         textLabel.frame = contentView.bounds
     }
-    
-//    override func prepareForReuse() {
-//        super.prepareForReuse()
-//        
-//    }
-    
-    
+     
 }
