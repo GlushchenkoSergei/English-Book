@@ -21,6 +21,8 @@ We all have a personal narrative that shapes our view of the world and ourselves
     var counterOneLine = 0
     
     private var componentsOfText: [String] = []
+    var indexSelectedRed: [Int] = []
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +46,6 @@ We all have a personal narrative that shapes our view of the world and ourselves
                 let x = 36 - counterOneLine
                 for _ in 0...x {
                     componentsOfText[index - 1] += " "
-                    print("добавил пробелы index \(index - 1)")
                 }
                 counterOneLine = 0
                 value = componentsOfText[index].count
@@ -70,15 +71,21 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as? WordCollectionViewCell else { fatalError() }
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as! WordCollectionViewCell
         cell.configure(with: componentsOfText[indexPath.row])
-        cell.backgroundColor = .systemGray3
+        cell.textLabel.textColor = indexSelectedRed.contains(indexPath.row) ? .red : .black
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("индекс - [\(indexPath.row)]")
-        print("символов \(componentsOfText[indexPath.row].count)")
+        
+        if !indexSelectedRed.contains(indexPath.row) {
+            indexSelectedRed.append(indexPath.row)
+        } else {
+           let indexFind = indexSelectedRed.firstIndex(of: indexPath.row) ?? 0
+            indexSelectedRed.remove(at: indexFind)
+        }
+        collectionView.reloadItems(at: [indexPath])
     }
     
 }
