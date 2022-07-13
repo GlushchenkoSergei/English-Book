@@ -9,31 +9,72 @@ import UIKit
 
 class PageViewController: UIViewController {
 
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    private let collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
     
-    let testText = """
-Writing about oneself and personal experiences — and then rewriting your story — can lead to behavioral changes and improve happiness. (We already know that expressive writing can improve mood disorders and help reduce symptoms among cancer patients, among other health benefits.)
-Some research suggests that writing in a personal journal for 15 minutes a day can lead to a boost in overall happiness and well-being, in part because it allows us to express our emotions, be mindful of our circumstances and resolve inner conflicts. Or you can take the next step and focus on one particular challenge you face, and write and rewrite that story.
-We all have a personal narrative that shapes our view of the world and ourselves. But sometimes our inner voice doesn’t get it right. By writing and then editing our own stories, we can change our perceptions of ourselves and identify obstacles that stand in the way of our personal well-being. The process is similar to Socratic questioning (referenced above). Here’s a writing exercise:
+    private let nextPageButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.right"), for: .normal)
+        return button
+    }()
+    
+    private let backPageButton: UIButton = {
+        let button = UIButton()
+        button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.backward"), for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let testText = """
+Practice. Develop a regular practice schedule and devote as much of your free time as possible to improving your talents in your star-making venture. Budding politicians need to practice speeches and public speaking. Musicians need to practice scales. Actors need to rehearse lines and study scenes. Pop stars need to work on their dance moves. Athletes need to train.
+Be careful to focus on the proper things. For an actor, it can be tempting to get caught up in superficial things. Updating your social networking, checking TMZ, and other gossip rags isn't "practicing" for being a star. It's wasting time. Study your craft, not the other stuff.
 """
     
-    var value = 0
-    var counterOneLine = 0
+    
+    // Для подсчета ширины cell
+    private let labelForCountingWidthCell: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.monospacedSystemFont(ofSize: 17, weight: .black)
+        return label
+    }()
+    private var sizesForCells: [Double] = []
+    
+    private var value = 0
+    private var counterOneLine = 0
     
     private var componentsOfText: [String] = []
-    var indexSelectedRed: [Int] = []
-
+    private var selectedWords: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "English Book"
+        view.backgroundColor = .white
         collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
-        collectionView.frame = view.bounds
+        
         view.addSubview(collectionView)
+        view.addSubview(nextPageButton)
+        view.addSubview(backPageButton)
+
+        setConstraints()
+        
         collectionView.delegate = self
         collectionView.dataSource = self
         
         componentsOfText = divisionIntoParts(this: testText)
         addingSpacerForLine(array: componentsOfText)
+        createArrayWidthCell()
+    }
+    
+    private func createArrayWidthCell() {
+        for component in componentsOfText {
+            labelForCountingWidthCell.text = component
+            labelForCountingWidthCell.sizeToFit()
+            sizesForCells.append(labelForCountingWidthCell.frame.width)
+        }
     }
     
     private func addingSpacerForLine(array: [String]) {
@@ -42,8 +83,8 @@ We all have a personal narrative that shapes our view of the world and ourselves
             
             value += componentsOfText[index].count
             
-            if value > 36 {
-                let x = 36 - counterOneLine
+            if value > 31 {
+                let x = 31 - counterOneLine
                 for _ in 0...x {
                     componentsOfText[index - 1] += " "
                 }
@@ -56,11 +97,20 @@ We all have a personal narrative that shapes our view of the world and ourselves
     
     private func divisionIntoParts(this text: String) -> [String] {
         var components: [String] = []
-        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .byWords) { substring, substringRange, enclosingRange, stop in
+        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .byWords) { _, _, enclosingRange, _ in
             components.append(String(text[enclosingRange]))
         }
         return components
     }
+    
+    private func removePunctuationMarks(this text: String) -> String {
+        var string: String = ""
+        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .byWords) { _, substringRange, _, _ in
+            string = String(text[substringRange])
+        }
+        return string
+    }
+
     
 }
 
@@ -72,20 +122,31 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as! WordCollectionViewCell
-        cell.configure(with: componentsOfText[indexPath.row])
-        cell.textLabel.textColor = indexSelectedRed.contains(indexPath.row) ? .red : .black
+
+        let word = removePunctuationMarks(this: componentsOfText[indexPath.row].lowercased())
+        cell.configure(with: componentsOfText[indexPath.row], sizeMask: gesSizeMask(text: word))
+        cell.maskTextView.backgroundColor = selectedWords.contains(word) ? #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
+        
         return cell
     }
     
+    func gesSizeMask(text: String) -> Double {
+        labelForCountingWidthCell.text = text
+        labelForCountingWidthCell.sizeToFit()
+        let size = labelForCountingWidthCell.frame.width
+        return size
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let word = removePunctuationMarks(this: componentsOfText[indexPath.row].lowercased())
         
-        if !indexSelectedRed.contains(indexPath.row) {
-            indexSelectedRed.append(indexPath.row)
+        if !selectedWords.contains(word) {
+            selectedWords.append(word)
         } else {
-           let indexFind = indexSelectedRed.firstIndex(of: indexPath.row) ?? 0
-            indexSelectedRed.remove(at: indexFind)
+           let indexFind = selectedWords.firstIndex(of: word) ?? 0
+            selectedWords.remove(at: indexFind)
         }
-        collectionView.reloadItems(at: [indexPath])
+        collectionView.reloadData()
     }
     
 }
@@ -93,86 +154,51 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
 extension PageViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
     }
     
     //расстояние между горизонтальными секциями
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 9
+        9
     }
     
     //расстояние между вертикальными разделителями
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+        0
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        if componentsOfText[indexPath.row].count < 3 {
-            return CGSize(width: (view.frame.size.width / 28) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 4 {
-            return CGSize(width: (view.frame.size.width / 14) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 5 {
-            return CGSize(width: (view.frame.size.width / 9.5) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 6 {
-            return CGSize(width: (view.frame.size.width / 7.6) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 7 {
-            return CGSize(width: (view.frame.size.width / 6.5) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 8 {
-            return CGSize(width: (view.frame.size.width / 5) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 9 {
-            return CGSize(width: (view.frame.size.width / 4.8) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 10 {
-            return CGSize(width: (view.frame.size.width / 4.6) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 11 {
-            return CGSize(width: (view.frame.size.width / 4) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 12 {
-            return CGSize(width: (view.frame.size.width / 3.6) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 13 {
-            return CGSize(width: (view.frame.size.width / 3) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 14 {
-            return CGSize(width: (view.frame.size.width / 2.8) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 15 {
-            return CGSize(width: (view.frame.size.width / 2.7) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 16 {
-            return CGSize(width: (view.frame.size.width / 2.9) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 18 {
-            return CGSize(width: (view.frame.size.width / 2.4) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 19 {
-            return CGSize(width: (view.frame.size.width / 2.3) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 20 {
-            return CGSize(width: (view.frame.size.width / 2.1) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 21 {
-            return CGSize(width: (view.frame.size.width / 2.0) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 22 {
-            return CGSize(width: (view.frame.size.width / 2.0) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 23 {
-            return CGSize(width: (view.frame.size.width / 2.0) , height: 30)
-            
-        } else if componentsOfText[indexPath.row].count < 32 {
-            return CGSize(width: (view.frame.size.width / 2) , height: 30)
-        }
-        
-        return CGSize(width: (view.frame.size.width / 1.5) , height: 30)
+        CGSize(width: (sizesForCells[indexPath.row]), height: 30)
     }
+}
+
+// Set constraints
+extension PageViewController {
+    
+    private func setConstraints() {
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -120)
+        ])
+        
+        NSLayoutConstraint.activate([
+            nextPageButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20),
+            nextPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 100),
+            nextPageButton.heightAnchor.constraint(equalToConstant: 50),
+            nextPageButton.widthAnchor.constraint(equalToConstant: 50)
+        ])
+        
+        NSLayoutConstraint.activate([
+            backPageButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20),
+            backPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -100),
+            backPageButton.heightAnchor.constraint(equalToConstant: 50),
+            backPageButton.widthAnchor.constraint(equalToConstant: 50)
+        ])
+        
+    }
+    
+    
 }
 
