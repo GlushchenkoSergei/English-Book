@@ -10,6 +10,7 @@ import UIKit
 class WordCollectionViewCell: UICollectionViewCell {
     
     static let identifier = "WordCollectionViewCell"
+    var sizeMask = 0.0
     
    let textLabel: UILabel = {
        let label = UILabel()
@@ -24,7 +25,6 @@ class WordCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
-    var sizeMask = 0.0
     
     override init(frame: CGRect) {
         super .init(frame: frame)
