@@ -8,15 +8,6 @@
 import UIKit
 
 class DownloadViewController: UIViewController {
-    
-    let downloadButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Download", for: .normal)
-        button.backgroundColor = .blue
-        button.layer.cornerRadius = 10
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
 
     let backButton: UIButton = {
         let button = UIButton()
@@ -58,14 +49,17 @@ class DownloadViewController: UIViewController {
         return tableView
     }()
     
-    var search = Search(count: 0, next: nil, previous: nil, results: nil)
+    var search = Search(count: 0, next: nil, previous: nil, results: nil) {
+        didSet {
+            nextLabel.text = "Страница №" + getNumberOfPage(string: search.next)
+            countLabel.text = String(search.count)
+            tableView.reloadData()
+        }
+    }
     var results: [Result] = []
-    
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.addSubview(downloadButton)
         view.addSubview(nextButton)
         view.addSubview(backButton)
         view.addSubview(tableView)
@@ -80,7 +74,7 @@ class DownloadViewController: UIViewController {
         tableView.dataSource = self
         
     
-        downloadButton.addTarget(self, action: #selector(downloadButtonAction), for: .touchUpInside)
+        downloadData()
         backButton.addTarget(self, action: #selector(backButtonAction), for: .touchUpInside)
         nextButton.addTarget(self, action: #selector(nextButtonAction), for: .touchUpInside)
     }
@@ -90,13 +84,9 @@ class DownloadViewController: UIViewController {
         setConstrains()
     }
     
-    @objc private func downloadButtonAction() {
+    private func downloadData() {
         NetworkManage.shared.fetchListOfSearch(url: LinK.searchBooks.rawValue) { search in
             self.search = search
-            self.results = search.results ?? []
-            self.countLabel.text = String(search.count)
-            self.nextLabel.text = search.next
-            self.tableView.reloadData()
         }
     }
     
@@ -104,10 +94,6 @@ class DownloadViewController: UIViewController {
         if search.previous != nil {
             NetworkManage.shared.fetchListOfSearch(url: search.previous ?? "") { search in
                 self.search = search
-                self.results = search.results ?? []
-                self.countLabel.text = String(search.count)
-                self.nextLabel.text = search.next
-                self.tableView.reloadData()
             }
         }
     }
@@ -116,29 +102,25 @@ class DownloadViewController: UIViewController {
         if search.next != nil {
             NetworkManage.shared.fetchListOfSearch(url: search.next ?? "") { search in
                 self.search = search
-                self.results = search.results ?? []
-                self.countLabel.text = String(search.count)
-                self.nextLabel.text = search.next
-                self.tableView.reloadData()
             }
         }
+    }
+    private func getNumberOfPage(string: String?) -> String {
+       let string = string?.components(separatedBy: "http://gutendex.com/books/?mime_type=text%2F&page=").last ?? ""
+        let page = (Int(string) ?? 0) - 1
+        return String(page)
     }
    
     private func setConstrains() {
         
         NSLayoutConstraint.activate([
-            downloadButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            downloadButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
             backButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            backButton.trailingAnchor.constraint(equalTo: downloadButton.leadingAnchor, constant: -30)
+            backButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: -30)
         ])
         
         NSLayoutConstraint.activate([
             nextButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            nextButton.leadingAnchor.constraint(equalTo: downloadButton.trailingAnchor, constant: 30)
+            nextButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 30)
         ])
         
         NSLayoutConstraint.activate([
@@ -155,7 +137,7 @@ class DownloadViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: countLabel.bottomAnchor, constant: 20),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: downloadButton.topAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -150)
         ])
     }
 
@@ -163,14 +145,18 @@ class DownloadViewController: UIViewController {
 
 extension DownloadViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        results.count
+//        results.count
+        search.results?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         var content = cell.defaultContentConfiguration()
-        content.text = results[indexPath.row].title
-        content.secondaryText = results[indexPath.row].authors?.first?.name
+        
+//        content.text = results[indexPath.row].title
+//        content.secondaryText = results[indexPath.row].authors?.first?.name
+        content.text = search.results?[indexPath.row].title
+        content.secondaryText = search.results?[indexPath.row].authors?.first?.name
         
         if let url = URL(string: search.results?[indexPath.row].formats.imageJPEG ?? "") {
             NetworkManage.shared.fetchDataImage(from: url) { data, response in

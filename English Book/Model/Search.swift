@@ -38,7 +38,7 @@ struct Formats: Codable {
 //    let applicationEpubZip: String
 //    let applicationRDFXML: String
 //    let applicationXMobipocketEbook: String
-//    let textPlainCharsetUsASCII: String
+    let textPlainCharsetUtf8: String?
     let imageJPEG: String?
 //    let applicationZip: String
 //    let textHTML: String
@@ -50,9 +50,10 @@ struct Formats: Codable {
 //        case applicationXMobipocketEbook = "application/x-mobipocket-ebook"
 //        case textPlainCharsetUsASCII = "text/plain; charset=us-ascii"
         case imageJPEG = "image/jpeg"
-//        case applicationZip = "application/zip"
+        case textPlainCharsetUtf8 = "text/plain; charset=utf-8"
 //        case textHTML = "text/html"
 //        case textPlain = "text/plain"
+        
     }
 }
 

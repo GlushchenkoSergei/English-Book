@@ -29,7 +29,7 @@ class PageViewController: UIViewController {
         return button
     }()
     
-    private let testText = """
+     var mainText = """
 Practice. Develop a regular practice schedule and devote as much of your free time as possible to improving your talents in your star-making venture. Budding politicians need to practice speeches and public speaking. Musicians need to practice scales. Actors need to rehearse lines and study scenes. Pop stars need to work on their dance moves. Athletes need to train.
 Be careful to focus on the proper things. For an actor, it can be tempting to get caught up in superficial things. Updating your social networking, checking TMZ, and other gossip rags isn't "practicing" for being a star. It's wasting time. Study your craft, not the other stuff.
 """
@@ -64,7 +64,7 @@ Be careful to focus on the proper things. For an actor, it can be tempting to ge
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        componentsOfText = divisionIntoParts(this: testText)
+        componentsOfText = divisionIntoParts(this: mainText)
         addingSpacerForLine(array: componentsOfText)
         createArrayWidthCell()
     }
@@ -79,7 +79,7 @@ Be careful to focus on the proper things. For an actor, it can be tempting to ge
     
     private func addingSpacerForLine(array: [String]) {
     
-        for index in 0...componentsOfText.count - 1{
+        for index in 0...componentsOfText.count - 1 {
             
             value += componentsOfText[index].count
             
