@@ -11,19 +11,15 @@ class DownloadViewController: UIViewController {
 
     let backButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Back", for: .normal)
-        button.backgroundColor = .blue
-        button.layer.cornerRadius = 10
+        button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.backward"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     let nextButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Next", for: .normal)
-        button.backgroundColor = .blue
-        button.layer.cornerRadius = 10
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.right"), for: .normal)
         return button
     }()
     
@@ -34,6 +30,7 @@ class DownloadViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
     
     let nextLabel: UILabel = {
         let label = UILabel()
@@ -65,7 +62,7 @@ class DownloadViewController: UIViewController {
         view.addSubview(tableView)
         view.addSubview(nextLabel)
         view.addSubview(countLabel)
-        
+        view.backgroundColor = .white
         
         tableView.rowHeight = 80
         
@@ -73,7 +70,6 @@ class DownloadViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-    
         downloadData()
         backButton.addTarget(self, action: #selector(backButtonAction), for: .touchUpInside)
         nextButton.addTarget(self, action: #selector(nextButtonAction), for: .touchUpInside)
@@ -114,13 +110,17 @@ class DownloadViewController: UIViewController {
     private func setConstrains() {
         
         NSLayoutConstraint.activate([
-            backButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            backButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: -30)
+            backButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            backButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: -30),
+            backButton.heightAnchor.constraint(equalToConstant: 50),
+            backButton.widthAnchor.constraint(equalToConstant: 50)
         ])
         
         NSLayoutConstraint.activate([
-            nextButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            nextButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 30)
+            nextButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            nextButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 30),
+            nextButton.heightAnchor.constraint(equalToConstant: 50),
+            nextButton.widthAnchor.constraint(equalToConstant: 50)
         ])
         
         NSLayoutConstraint.activate([
@@ -137,7 +137,7 @@ class DownloadViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: countLabel.bottomAnchor, constant: 20),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -150)
+            tableView.bottomAnchor.constraint(equalTo: backButton.topAnchor, constant: -20)
         ])
     }
 
@@ -145,16 +145,13 @@ class DownloadViewController: UIViewController {
 
 extension DownloadViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        results.count
         search.results?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         var content = cell.defaultContentConfiguration()
-        
-//        content.text = results[indexPath.row].title
-//        content.secondaryText = results[indexPath.row].authors?.first?.name
+
         content.text = search.results?[indexPath.row].title
         content.secondaryText = search.results?[indexPath.row].authors?.first?.name
         
@@ -171,9 +168,10 @@ extension DownloadViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         let detailVC = DetailViewController()
         detailVC.result = search.results?[indexPath.row]
-        present(UINavigationController(rootViewController: detailVC), animated: true)
+        navigationController?.pushViewController(detailVC, animated: true)
     }
     
     

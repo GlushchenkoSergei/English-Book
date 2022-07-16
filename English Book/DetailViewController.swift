@@ -58,7 +58,6 @@ class DetailViewController: UIViewController {
     var mainText = "" {
         didSet {
             DispatchQueue.main.async {
-            
                 self.openPageVCButton.isHidden = false
             }
         }
@@ -99,15 +98,12 @@ Author: \(result.authors?.first?.name ?? "")
     
     @objc private func openPageVCButtonAction() {
     let pageVC = PageViewController()
-        
     pageVC.mainText = mainText
-    present(pageVC, animated: true)
+    navigationController?.pushViewController(pageVC, animated: true)
     }
     
     @objc private func readButtonAction() {
-//        print(result.formats.textPlainCharsetUtf8)
         guard let urlString = result.formats.textPlainCharsetUtf8 else { return }
-        
         guard let url = URL(string: urlString) else { return }
         
         let urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
@@ -170,8 +166,6 @@ Author: \(result.authors?.first?.name ?? "")
             openPageVCButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             openPageVCButton.widthAnchor.constraint(equalToConstant: 250)
         ])
-        
-        
     }
     
 }
