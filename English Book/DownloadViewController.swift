@@ -8,7 +8,7 @@
 import UIKit
 
 class DownloadViewController: UIViewController {
-
+    
     let backButton: UIButton = {
         let button = UIButton()
         button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.backward"), for: .normal)
@@ -81,14 +81,14 @@ class DownloadViewController: UIViewController {
     }
     
     private func downloadData() {
-        NetworkManage.shared.fetchListOfSearch(url: LinK.searchBooks.rawValue) { search in
+        NetworkManage.shared.fetchDataSearch(url: LinK.searchBooks.rawValue) { search in
             self.search = search
         }
     }
     
     @objc private func backButtonAction() {
         if search.previous != nil {
-            NetworkManage.shared.fetchListOfSearch(url: search.previous ?? "") { search in
+            NetworkManage.shared.fetchDataSearch(url: search.previous ?? "") { search in
                 self.search = search
             }
         }
@@ -96,17 +96,17 @@ class DownloadViewController: UIViewController {
     
     @objc private func nextButtonAction() {
         if search.next != nil {
-            NetworkManage.shared.fetchListOfSearch(url: search.next ?? "") { search in
+            NetworkManage.shared.fetchDataSearch(url: search.next ?? "") { search in
                 self.search = search
             }
         }
     }
     private func getNumberOfPage(string: String?) -> String {
-       let string = string?.components(separatedBy: "http://gutendex.com/books/?mime_type=text%2F&page=").last ?? ""
+        let string = string?.components(separatedBy: "http://gutendex.com/books/?mime_type=text%2F&page=").last ?? ""
         let page = (Int(string) ?? 0) - 1
         return String(page)
     }
-   
+    
     private func setConstrains() {
         
         NSLayoutConstraint.activate([
@@ -140,7 +140,7 @@ class DownloadViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: backButton.topAnchor, constant: -20)
         ])
     }
-
+    
 }
 
 extension DownloadViewController: UITableViewDelegate, UITableViewDataSource {
@@ -151,13 +151,14 @@ extension DownloadViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         var content = cell.defaultContentConfiguration()
-
+        
         content.text = search.results?[indexPath.row].title
         content.secondaryText = search.results?[indexPath.row].authors?.first?.name
         
-        if let url = URL(string: search.results?[indexPath.row].formats.imageJPEG ?? "") {
-            NetworkManage.shared.fetchDataImage(from: url) { data, response in
-//                print(response) для кэширования изображений
+        if let url = search.results?[indexPath.row].formats.imageJPEG {
+            NetworkManage.shared.fetchDataFrom(url: url) { progress in
+                
+            } completion: { data in
                 content.image = UIImage(data: data)
                 cell.contentConfiguration = content
             }

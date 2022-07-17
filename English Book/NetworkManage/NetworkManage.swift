@@ -6,43 +6,44 @@
 //
 
 import Foundation
+import Alamofire
 
 class NetworkManage {
     static let shared = NetworkManage()
     private init() {}
     
-    func fetchListOfSearch(url: String, completion: @escaping(Search) -> Void ) {
-        guard let urlType = URL(string: url) else { return }
-        
-        URLSession.shared.dataTask(with: urlType) { data, _, error in
-            guard let data = data else {
-                print(error?.localizedDescription ?? "Нет описания ошибки")
-                return
-            }
-            do {
-                let cocktails = try JSONDecoder().decode(Search.self, from: data)
-                DispatchQueue.main.async {
-                    completion(cocktails)
+
+    func fetchDataSearch(url: String, completion: @escaping(Search) -> Void) {
+        request(url).response { response in
+                guard let data = response.data else { return }
+                do {
+                    let cocktails = try JSONDecoder().decode(Search.self, from: data)
+                        completion(cocktails)
+                } catch {
+                    print(error.localizedDescription)
                 }
-            } catch {
-                print(error.localizedDescription)
             }
-        }.resume()
     }
     
-    func fetchDataImage(from url: URL, completion: @escaping(Data, URLResponse) -> Void ) {
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, let response = response else {
-                print(error?.localizedDescription ?? "Нет описания ошибки")
-                return}
-            
-            // Доп проверка на url для коректного отображения в таблице
-            guard url == response.url else { return }
-            
-            DispatchQueue.main.async {
-                completion(data, response)
+    func fetchDataFrom(url: String, progressDownload: @escaping(Progress) -> Void, completion: @escaping(Data) -> Void) {
+        
+        request(url)
+            .downloadProgress(closure: { progress in
+                progressDownload(progress)
+            })
+            .response { response in
+                if let data = response.data {
+                    completion(data)
+                }
             }
-            
-        }.resume()
+        
     }
+    
+    func fetchResponseFrom(url: String, completion: @escaping(DefaultDataResponse) -> Void) {
+        request(url)
+            .response { response in
+                    completion(response)
+                }
+    }
+    
 }

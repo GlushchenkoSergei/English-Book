@@ -51,7 +51,7 @@ class DetailViewController: UIViewController {
     
     var fileURL: URL? {
         didSet {
-            mainText = readFile(url: fileURL)
+            //            mainText = readFile(url: fileURL)
         }
     }
     
@@ -62,7 +62,7 @@ class DetailViewController: UIViewController {
             }
         }
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -97,29 +97,18 @@ Author: \(result.authors?.first?.name ?? "")
     }
     
     @objc private func openPageVCButtonAction() {
-    let pageVC = PageViewController()
-    pageVC.mainText = mainText
-    navigationController?.pushViewController(pageVC, animated: true)
+        let pageVC = PageViewController()
+        pageVC.mainText = mainText
+        navigationController?.pushViewController(pageVC, animated: true)
     }
     
     @objc private func readButtonAction() {
-        guard let urlString = result.formats.textPlainCharsetUtf8 else { return }
-        guard let url = URL(string: urlString) else { return }
-        
-        let urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
-        let downLoadTask =  urlSession.downloadTask(with: url)
-        downLoadTask.resume()
-    }
-    
-    private func readFile(url: URL?) -> String {
-        guard let url = url else { return "1"}
-        var string = ""
-        do {
-            try string = String(contentsOf: url)
-        } catch let error {
-            print(error)
+        guard let url = result.formats.textPlainCharsetUtf8 else { return }
+        NetworkManage.shared.fetchDataFrom(url: url) { progress in
+            print(progress.localizedDescription!)
+        } completion: { data in
+            //            let str = String(data: data, encoding: .utf8)
         }
-        return string
     }
     
     private func checkZip(string: String?) -> Bool {
@@ -133,8 +122,9 @@ Author: \(result.authors?.first?.name ?? "")
     }
     
     private func setImage() {
-        if let url = URL(string: result.formats.imageJPEG ?? "") {
-            NetworkManage.shared.fetchDataImage(from: url) { data, _ in
+        guard let url = result.formats.imageJPEG else { return }
+        NetworkManage.shared.fetchResponseFrom(url: url) { response in
+            if let data = response.data{
                 self.imageBook.image = UIImage(data: data)
             }
         }
@@ -170,22 +160,26 @@ Author: \(result.authors?.first?.name ?? "")
     
 }
 
-extension DetailViewController: URLSessionDownloadDelegate {
-    
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        guard let url = downloadTask.originalRequest?.url else { return }
-        let docsPath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        let destinationPath = docsPath.appendingPathComponent(url.lastPathComponent)
-        
-//        try? FileManager.default.removeItem(at: destinationPath)
-        
-        do {
-            try FileManager.default.copyItem(at: location, to: destinationPath)
-            fileURL = destinationPath
-        } catch let error{
-            print(error.localizedDescription)
-        }
-        
-    }
-    
-}
+//extension DetailViewController: URLSessionDownloadDelegate {
+//
+//    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+//
+//        print("Локация\(location)")
+//        guard let url = downloadTask.originalRequest?.url else { return }
+////        print(url)
+//        print("ЮРЛ\(url)")
+//        let docsPath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+//        let destinationPath = docsPath.appendingPathComponent(url.lastPathComponent)
+//
+////        try? FileManager.default.removeItem(at: destinationPath)
+//
+//        do {
+//            try FileManager.default.copyItem(at: location, to: destinationPath)
+//            fileURL = destinationPath
+//        } catch let error{
+//            print(error.localizedDescription)
+//        }
+//
+//    }
+//
+//}

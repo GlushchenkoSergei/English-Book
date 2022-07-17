@@ -14,29 +14,29 @@ class MainViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-
+    
     private let backgroundViewDictionary: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-
+    
     private let bottomLabelView: UIView = {
         let view = UIView()
-         view.layer.cornerRadius = 25
-         view.clipsToBounds = true
-         view.backgroundColor = .systemGray
-         view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 25
+        view.clipsToBounds = true
+        view.backgroundColor = .systemGray
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let libraryLabel: UILabel = {
-       let view = UILabel()
-       view.text = "Library"
-       view.font = UIFont.boldSystemFont(ofSize: 20)
-       view.translatesAutoresizingMaskIntoConstraints = false
-       return view
-   }()
+        let view = UILabel()
+        view.text = "Library"
+        view.font = UIFont.boldSystemFont(ofSize: 20)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     
     private let dictionaryLabel: UILabel = {
         let view = UILabel()
@@ -47,39 +47,39 @@ class MainViewController: UIViewController {
     }()
     
     private let myLibraryButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setTitle("My library", for: .normal)
-       return button
-   }()
+        return button
+    }()
     
     private let searchButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setTitle("Search book", for: .normal)
-       return button
-   }()
+        return button
+    }()
     
     
     private let repeatButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setTitle("Repeat", for: .normal)
-       return button
-   }()
+        return button
+    }()
     
     private let learnButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setTitle("Learn words", for: .normal)
-       return button
-   }()
+        return button
+    }()
     
-   private let color3 = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.0)
+    private let color3 = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.0)
     private let color2 = UIColor(red: 33/255, green: 78/255, blue: 132/255, alpha: 0.40)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "English Book"
         addSubview(someViews: [backgroundViewLibrary, backgroundViewDictionary, bottomLabelView,
-                             libraryLabel, myLibraryButton, searchButton, dictionaryLabel,
-                             learnButton, repeatButton])
+                               libraryLabel, myLibraryButton, searchButton, dictionaryLabel,
+                               learnButton, repeatButton])
         navigationController?.navigationBar.prefersLargeTitles = true
         view.backgroundColor = .white
         addTarget()
@@ -128,22 +128,22 @@ class MainViewController: UIViewController {
             button.layer.borderWidth = 1
             button.translatesAutoresizingMaskIntoConstraints = false
             button.addGradient(colors: [color2, color3],
-                                     startPoint: Point.leading.point,
-                                     endPoint: Point.trailing.point)
+                               startPoint: Point.leading.point,
+                               endPoint: Point.trailing.point)
         }
         
     }
     
     private func addGradients() {
         backgroundViewLibrary.addGradient(colors: [color2, color3],
-                                       startPoint: Point.leading.point,
-                                       endPoint: Point.trailing.point)
+                                          startPoint: Point.leading.point,
+                                          endPoint: Point.trailing.point)
         
         backgroundViewDictionary.addGradient(colors: [color2, color3],
-                                         startPoint: Point.leading.point,
-                                         endPoint: Point.trailing.point)
+                                             startPoint: Point.leading.point,
+                                             endPoint: Point.trailing.point)
     }
-
+    
 }
 extension MainViewController {
     
@@ -177,7 +177,7 @@ extension MainViewController {
             backgroundViewDictionary.widthAnchor.constraint(equalToConstant: view.bounds.width),
             backgroundViewDictionary.heightAnchor.constraint(equalToConstant: view.bounds.height / 3)
         ])
-
+        
         NSLayoutConstraint.activate([
             dictionaryLabel.topAnchor.constraint(equalTo: backgroundViewDictionary.topAnchor, constant: 20),
             dictionaryLabel.leadingAnchor.constraint(equalTo: backgroundViewDictionary.leadingAnchor, constant: 20)

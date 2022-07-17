@@ -8,7 +8,7 @@
 import UIKit
 
 class PageViewController: UIViewController {
-
+    
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -29,7 +29,7 @@ class PageViewController: UIViewController {
         return button
     }()
     
-     var mainText = """
+    var mainText = """
 Practice. Develop a regular practice schedule and devote as much of your free time as possible to improving your talents in your star-making venture. Budding politicians need to practice speeches and public speaking. Musicians need to practice scales. Actors need to rehearse lines and study scenes. Pop stars need to work on their dance moves. Athletes need to train.
 Be careful to focus on the proper things. For an actor, it can be tempting to get caught up in superficial things. Updating your social networking, checking TMZ, and other gossip rags isn't "practicing" for being a star. It's wasting time. Study your craft, not the other stuff.
 """
@@ -58,7 +58,7 @@ Be careful to focus on the proper things. For an actor, it can be tempting to ge
         view.addSubview(collectionView)
         view.addSubview(nextPageButton)
         view.addSubview(backPageButton)
-
+        
         setConstraints()
         
         collectionView.delegate = self
@@ -78,7 +78,7 @@ Be careful to focus on the proper things. For an actor, it can be tempting to ge
     }
     
     private func addingSpacerForLine(array: [String]) {
-    
+        
         for index in 0...componentsOfText.count - 1 {
             
             value += componentsOfText[index].count
@@ -110,7 +110,7 @@ Be careful to focus on the proper things. For an actor, it can be tempting to ge
         }
         return string
     }
-
+    
     
 }
 
@@ -122,7 +122,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as! WordCollectionViewCell
-
+        
         let word = removePunctuationMarks(this: componentsOfText[indexPath.row].lowercased())
         cell.configure(with: componentsOfText[indexPath.row], sizeMask: gesSizeMask(text: word))
         cell.maskTextView.backgroundColor = selectedWords.contains(word) ? #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
@@ -143,7 +143,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         if !selectedWords.contains(word) {
             selectedWords.append(word)
         } else {
-           let indexFind = selectedWords.firstIndex(of: word) ?? 0
+            let indexFind = selectedWords.firstIndex(of: word) ?? 0
             selectedWords.remove(at: indexFind)
         }
         collectionView.reloadData()
@@ -198,7 +198,6 @@ extension PageViewController {
         ])
         
     }
-    
     
 }
 
