@@ -23,19 +23,11 @@ class SearchViewController: UIViewController {
         return button
     }()
     
-    let countLabel: UILabel = {
+    let pageCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "Число - nill"
-        label.backgroundColor = .blue
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    
-    let nextLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Слудущая страница"
-        label.backgroundColor = .blue
+        label.text = "Page 1"
+        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.textColor = .blue
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -53,12 +45,11 @@ class SearchViewController: UIViewController {
     
     var search = Search(count: 0, next: nil, previous: nil, results: nil) {
         didSet {
-            nextLabel.text = "Страница №" + getNumberOfPage(string: search.next)
-            countLabel.text = String(search.count)
+            pageCountLabel.text = "Page " + getNumberOfPage(string: search.next)
+            title = "Found \(String(search.count)) books"
             tableView.reloadData()
         }
     }
-    var results: [Result] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,15 +57,14 @@ class SearchViewController: UIViewController {
         view.addSubview(nextButton)
         view.addSubview(backButton)
         view.addSubview(tableView)
-        view.addSubview(nextLabel)
-        view.addSubview(countLabel)
-        
+        view.addSubview(pageCountLabel)
 
+        
         activityIndicator.center = view.center
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
         
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         tableView.rowHeight = 80
         
@@ -102,13 +92,13 @@ class SearchViewController: UIViewController {
             completion: { search in
                 self.search = search
                 self.activityIndicator.stopAnimating()
-
             }
         )
         
     }
     
     @objc private func backButtonAction() {
+        tableView.isHidden = true
         activityIndicator.startAnimating()
         if search.previous != nil {
             NetworkManage.shared.fetchDataSearch(
@@ -120,6 +110,8 @@ class SearchViewController: UIViewController {
                 completion: { search in
                     self.search = search
                     self.activityIndicator.stopAnimating()
+                    self.tableView.isHidden = false
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
                 }
             )
             
@@ -127,6 +119,7 @@ class SearchViewController: UIViewController {
     }
     
     @objc private func nextButtonAction() {
+        tableView.isHidden = true
         activityIndicator.startAnimating()
         if search.next != nil {
             NetworkManage.shared.fetchDataSearch(
@@ -134,16 +127,18 @@ class SearchViewController: UIViewController {
                 progressDownload: { progressDownload in
 //                    self.progressView.setProgress(Float(progressDownload.fractionCompleted),
 //                                                  animated: true)
-                    
                 },
                 completion: {
                     search in self.search = search
                     self.activityIndicator.stopAnimating()
+                    self.tableView.isHidden = false
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
                 }
             )
             
         }
     }
+    
     private func getNumberOfPage(string: String?) -> String {
         let string = string?.components(separatedBy: "http://gutendex.com/books/?mime_type=text%2F&page=").last ?? ""
         let page = (Int(string) ?? 0) - 1
@@ -153,35 +148,31 @@ class SearchViewController: UIViewController {
     private func setConstrains() {
         
         NSLayoutConstraint.activate([
+            pageCountLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60),
+            pageCountLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
             backButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
-            backButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: -30),
+            backButton.trailingAnchor.constraint(equalTo: pageCountLabel.leadingAnchor, constant: -20),
             backButton.heightAnchor.constraint(equalToConstant: 50),
             backButton.widthAnchor.constraint(equalToConstant: 50)
         ])
         
         NSLayoutConstraint.activate([
             nextButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
-            nextButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 30),
+            nextButton.leadingAnchor.constraint(equalTo: pageCountLabel.trailingAnchor, constant: 20),
             nextButton.heightAnchor.constraint(equalToConstant: 50),
             nextButton.widthAnchor.constraint(equalToConstant: 50)
         ])
         
         NSLayoutConstraint.activate([
-            countLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.safeAreaInsets.top),
-            countLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30)
-        ])
-        
-        NSLayoutConstraint.activate([
-            nextLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.safeAreaInsets.top),
-            nextLabel.leadingAnchor.constraint(equalTo: countLabel.trailingAnchor, constant: 20)
-        ])
-        
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: countLabel.bottomAnchor, constant: 20),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: view.safeAreaInsets.top),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: backButton.topAnchor, constant: -20)
         ])
+        
     }
     
 }

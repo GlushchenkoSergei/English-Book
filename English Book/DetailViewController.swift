@@ -29,12 +29,14 @@ class DetailViewController: UIViewController {
         return label
     }()
     
-    private let readButton: UIButton = {
+    private let downloadButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Чиать", for: .normal)
+        button.setTitle("Download", for: .normal)
         button.backgroundColor = .systemGray2
         button.isEnabled = false
+        button.layer.borderWidth = 1
+        button.setTitleColor(UIColor.black, for: .normal)
         button.layer.cornerRadius = 12
         return button
     }()
@@ -42,38 +44,45 @@ class DetailViewController: UIViewController {
     private let openPageVCButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Открыть", for: .normal)
+        button.setTitle("Читать", for: .normal)
         button.backgroundColor = .red
+        button.layer.borderWidth = 1
         button.isHidden = true
         button.layer.cornerRadius = 12
         return button
     }()
     
-    var fileURL: URL? {
-        didSet {
-            //            mainText = readFile(url: fileURL)
-        }
-    }
+    let progressMask: UIView = {
+        let view = UIView()
+        view.backgroundColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 0.8166104752)
+        view.isHidden = true
+        view.layer.cornerRadius = 12
+        return view
+    }()
+    
+    lazy var originalPosition: CGPoint = {
+     downloadButton.frame.origin
+    }()
+    
+   
     
     var mainText = "" {
         didSet {
-            DispatchQueue.main.async {
-                self.openPageVCButton.isHidden = false
-            }
+               openPageVCButton.isHidden = false
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.prefersLargeTitles = true
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         title = result.title
         
         if checkZip(string: result.formats.textPlainCharsetUtf8) {
-            readButton.isEnabled = true
-            readButton.backgroundColor = .blue
+            downloadButton.isEnabled = true
+            downloadButton.backgroundColor = .blue
         } else {
-            readButton.setTitle("Нет данных", for: .normal)
+            downloadButton.setTitle("Нет данных", for: .normal)
         }
         
         labelBook.text = """
@@ -84,13 +93,14 @@ Author: \(result.authors?.first?.name ?? "")
    Birth date: \(result.authors?.first?.birth_year ?? 0)
    Death date: \(result.authors?.first?.death_year ?? 0)
 """
-        
         view.addSubview(imageBook)
         view.addSubview(labelBook)
-        view.addSubview(readButton)
+        view.addSubview(downloadButton)
         view.addSubview(openPageVCButton)
+        view.addSubview(progressMask)
         
-        readButton.addTarget(self, action: #selector(readButtonAction), for: .touchUpInside)
+        
+        downloadButton.addTarget(self, action: #selector(DownloadButtonAction), for: .touchUpInside)
         openPageVCButton.addTarget(self, action: #selector(openPageVCButtonAction), for: .touchUpInside)
         setImage()
         setConstrains()
@@ -102,12 +112,26 @@ Author: \(result.authors?.first?.name ?? "")
         navigationController?.pushViewController(pageVC, animated: true)
     }
     
-    @objc private func readButtonAction() {
+    @objc private func DownloadButtonAction() {
+        progressMask.isHidden = false
+        downloadButton.backgroundColor = .white
+        downloadButton.setTitle("0 % completed", for: .normal)
+        
         guard let url = result.formats.textPlainCharsetUtf8 else { return }
         NetworkManage.shared.fetchDataFrom(url: url) { progress in
-            print(progress.localizedDescription!)
+            self.progressMask.frame = CGRect(x: 0,
+                                          y: 0,
+                                        width: self.downloadButton.frame.width * CGFloat(progress.fractionCompleted),
+                                        height: 50)
+            self.progressMask.frame.origin = self.originalPosition
+            self.downloadButton.setTitle(progress.localizedDescription, for: .normal)
+            
         } completion: { data in
-            //            let str = String(data: data, encoding: .utf8)
+            
+            self.progressMask.isHidden = true
+            self.downloadButton.backgroundColor = .systemGray2
+            self.downloadButton.setTitle("Download", for: .normal)
+            self.mainText = String(data: data, encoding: .utf8) ?? ""
         }
     }
     
@@ -146,15 +170,17 @@ Author: \(result.authors?.first?.name ?? "")
         ])
         
         NSLayoutConstraint.activate([
-            readButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -150),
-            readButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            readButton.widthAnchor.constraint(equalToConstant: 250)
+            downloadButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -150),
+            downloadButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            downloadButton.widthAnchor.constraint(equalToConstant: 250),
+            downloadButton.heightAnchor.constraint(equalToConstant: 50)
         ])
         
         NSLayoutConstraint.activate([
-            openPageVCButton.topAnchor.constraint(equalTo: readButton.bottomAnchor, constant: 20),
+            openPageVCButton.topAnchor.constraint(equalTo: downloadButton.bottomAnchor, constant: 20),
             openPageVCButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            openPageVCButton.widthAnchor.constraint(equalToConstant: 250)
+            openPageVCButton.widthAnchor.constraint(equalToConstant: 250),
+            openPageVCButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     

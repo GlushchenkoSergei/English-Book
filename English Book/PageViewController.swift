@@ -52,7 +52,7 @@ Be careful to focus on the proper things. For an actor, it can be tempting to ge
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "English Book"
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
         
         view.addSubview(collectionView)
