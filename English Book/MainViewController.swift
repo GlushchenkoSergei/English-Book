@@ -100,18 +100,18 @@ class MainViewController: UIViewController {
     }
     
     @objc private func tapMyLibraryButton() {
-        print("моя библиотека")
+        
     }
     @objc private func tapSearchButton() {
-        print("поиск")
-        let downloadVC = DownloadViewController()
-        navigationController?.pushViewController(downloadVC, animated: true)
+
+        let searchVC = SearchViewController()
+        navigationController?.pushViewController(searchVC, animated: true)
     }
     @objc private func tapRepeatButton() {
-        print("повторить")
+      
     }
     @objc private func tapLearnButton() {
-        print("усиить")
+       
     }
     
     private func addSubview(someViews: [UIView]) {

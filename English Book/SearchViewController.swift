@@ -7,7 +7,7 @@
 
 import UIKit
 
-class DownloadViewController: UIViewController {
+class SearchViewController: UIViewController {
     
     let backButton: UIButton = {
         let button = UIButton()
@@ -46,6 +46,11 @@ class DownloadViewController: UIViewController {
         return tableView
     }()
     
+    let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        return indicator
+    }()
+    
     var search = Search(count: 0, next: nil, previous: nil, results: nil) {
         didSet {
             nextLabel.text = "Страница №" + getNumberOfPage(string: search.next)
@@ -57,11 +62,18 @@ class DownloadViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        downloadData()
         view.addSubview(nextButton)
         view.addSubview(backButton)
         view.addSubview(tableView)
         view.addSubview(nextLabel)
         view.addSubview(countLabel)
+        
+
+        activityIndicator.center = view.center
+        view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+        
         view.backgroundColor = .white
         
         tableView.rowHeight = 80
@@ -70,7 +82,6 @@ class DownloadViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        downloadData()
         backButton.addTarget(self, action: #selector(backButtonAction), for: .touchUpInside)
         nextButton.addTarget(self, action: #selector(nextButtonAction), for: .touchUpInside)
     }
@@ -81,24 +92,56 @@ class DownloadViewController: UIViewController {
     }
     
     private func downloadData() {
-        NetworkManage.shared.fetchDataSearch(url: LinK.searchBooks.rawValue) { search in
-            self.search = search
-        }
+        
+        NetworkManage.shared.fetchDataSearch(
+            url: LinK.searchBooks.rawValue,
+            progressDownload: { progressDownload in
+//                self.progressView.setProgress(Float(progressDownload.fractionCompleted),
+//                                              animated: true)
+            },
+            completion: { search in
+                self.search = search
+                self.activityIndicator.stopAnimating()
+
+            }
+        )
+        
     }
     
     @objc private func backButtonAction() {
+        activityIndicator.startAnimating()
         if search.previous != nil {
-            NetworkManage.shared.fetchDataSearch(url: search.previous ?? "") { search in
-                self.search = search
-            }
+            NetworkManage.shared.fetchDataSearch(
+                url: search.previous ?? "",
+                progressDownload: { progressDownload in
+//                    self.progressView.setProgress(Float(progressDownload.fractionCompleted),
+//                                                  animated: true)
+                },
+                completion: { search in
+                    self.search = search
+                    self.activityIndicator.stopAnimating()
+                }
+            )
+            
         }
     }
     
     @objc private func nextButtonAction() {
+        activityIndicator.startAnimating()
         if search.next != nil {
-            NetworkManage.shared.fetchDataSearch(url: search.next ?? "") { search in
-                self.search = search
-            }
+            NetworkManage.shared.fetchDataSearch(
+                url: search.next ?? "",
+                progressDownload: { progressDownload in
+//                    self.progressView.setProgress(Float(progressDownload.fractionCompleted),
+//                                                  animated: true)
+                    
+                },
+                completion: {
+                    search in self.search = search
+                    self.activityIndicator.stopAnimating()
+                }
+            )
+            
         }
     }
     private func getNumberOfPage(string: String?) -> String {
@@ -143,7 +186,7 @@ class DownloadViewController: UIViewController {
     
 }
 
-extension DownloadViewController: UITableViewDelegate, UITableViewDataSource {
+extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         search.results?.count ?? 0
     }

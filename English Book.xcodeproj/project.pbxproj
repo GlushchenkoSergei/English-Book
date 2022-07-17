@@ -11,7 +11,7 @@
 		0477C3542882C51E0013C5A3 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3532882C51E0013C5A3 /* Point.swift */; };
 		0477C3582882C6880013C5A3 /* Extension + UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3572882C6880013C5A3 /* Extension + UIView.swift */; };
 		0482F0AC28815A0900EB5F62 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 0482F0AB28815A0900EB5F62 /* .gitignore */; };
-		0482F0AE28815A8700EB5F62 /* DownloadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0482F0AD28815A8700EB5F62 /* DownloadViewController.swift */; };
+		0482F0AE28815A8700EB5F62 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0482F0AD28815A8700EB5F62 /* SearchViewController.swift */; };
 		0482F0B028815E2300EB5F62 /* NetworkManage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0482F0AF28815E2300EB5F62 /* NetworkManage.swift */; };
 		0482F0B528815F9D00EB5F62 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0482F0B428815F9D00EB5F62 /* Search.swift */; };
 		0482F0B72881714A00EB5F62 /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0482F0B62881714A00EB5F62 /* Link.swift */; };
@@ -29,7 +29,7 @@
 		0477C3532882C51E0013C5A3 /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
 		0477C3572882C6880013C5A3 /* Extension + UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension + UIView.swift"; sourceTree = "<group>"; };
 		0482F0AB28815A0900EB5F62 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		0482F0AD28815A8700EB5F62 /* DownloadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadViewController.swift; sourceTree = "<group>"; };
+		0482F0AD28815A8700EB5F62 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		0482F0AF28815E2300EB5F62 /* NetworkManage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManage.swift; sourceTree = "<group>"; };
 		0482F0B428815F9D00EB5F62 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		0482F0B62881714A00EB5F62 /* Link.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
@@ -126,7 +126,7 @@
 				0482F0B128815EF500EB5F62 /* Model */,
 				0477C3562882C6660013C5A3 /* Extensions */,
 				0477C3552882C5DB0013C5A3 /* Helpers */,
-				0482F0AD28815A8700EB5F62 /* DownloadViewController.swift */,
+				0482F0AD28815A8700EB5F62 /* SearchViewController.swift */,
 				049559F1287C68F000B482F8 /* PageViewController.swift */,
 				0477C3512882BD9E0013C5A3 /* MainViewController.swift */,
 				0482F0B8288187DD00EB5F62 /* DetailViewController.swift */,
@@ -144,7 +144,6 @@
 				7E4CFC68CCF554B60FB16E54 /* Pods-English Book.debug.xcconfig */,
 				34405F7DCBE949490131A513 /* Pods-English Book.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -277,7 +276,7 @@
 				0482F0B028815E2300EB5F62 /* NetworkManage.swift in Sources */,
 				049559F2287C68F000B482F8 /* PageViewController.swift in Sources */,
 				0482F0B528815F9D00EB5F62 /* Search.swift in Sources */,
-				0482F0AE28815A8700EB5F62 /* DownloadViewController.swift in Sources */,
+				0482F0AE28815A8700EB5F62 /* SearchViewController.swift in Sources */,
 				0477C3522882BD9E0013C5A3 /* MainViewController.swift in Sources */,
 				049559EE287C68F000B482F8 /* AppDelegate.swift in Sources */,
 				0482F0B9288187DD00EB5F62 /* DetailViewController.swift in Sources */,
