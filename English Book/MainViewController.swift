@@ -58,7 +58,6 @@ class MainViewController: UIViewController {
         return button
     }()
     
-    
     private let repeatButton: UIButton = {
         let button = UIButton()
         button.setTitle("Repeat", for: .normal)
@@ -102,14 +101,16 @@ class MainViewController: UIViewController {
     @objc private func tapMyLibraryButton() {
         
     }
+    
     @objc private func tapSearchButton() {
-
         let searchVC = SearchViewController()
         navigationController?.pushViewController(searchVC, animated: true)
     }
+    
     @objc private func tapRepeatButton() {
       
     }
+    
     @objc private func tapLearnButton() {
        
     }

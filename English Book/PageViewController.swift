@@ -22,6 +22,13 @@ class PageViewController: UIViewController {
         return button
     }()
     
+    private let allPagesLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .systemGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     private let backPageButton: UIButton = {
         let button = UIButton()
         button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.backward"), for: .normal)
@@ -29,11 +36,8 @@ class PageViewController: UIViewController {
         return button
     }()
     
-    var mainText = """
-Practice. Develop a regular practice schedule and devote as much of your free time as possible to improving your talents in your star-making venture. Budding politicians need to practice speeches and public speaking. Musicians need to practice scales. Actors need to rehearse lines and study scenes. Pop stars need to work on their dance moves. Athletes need to train.
-Be careful to focus on the proper things. For an actor, it can be tempting to get caught up in superficial things. Updating your social networking, checking TMZ, and other gossip rags isn't "practicing" for being a star. It's wasting time. Study your craft, not the other stuff.
-"""
-    
+    var pagesOfBook: [String] = []
+    var nameBook = ""
     
     // Для подсчета ширины cell
     private let labelForCountingWidthCell: UILabel = {
@@ -41,57 +45,95 @@ Be careful to focus on the proper things. For an actor, it can be tempting to ge
         label.font = UIFont.monospacedSystemFont(ofSize: 17, weight: .black)
         return label
     }()
-    private var sizesForCells: [Double] = []
+   
+    private var currentPage = 1 {
+        didSet{
+            componentsOfPage = divisionIntoParts(this: pagesOfBook[currentPage - 1])
+            addingSpacerForLine()
+            createArrayWidthCell()
+            collectionView.reloadData()
+        }
+    }
     
     private var value = 0
     private var counterOneLine = 0
     
-    private var componentsOfText: [String] = []
+    private var componentsOfPage: [String] = []
+    private var sizesForCells: [Double] = []
     private var selectedWords: [String] = []
+    
+    
+    private var wordsCoreData: [WordIKnow] = []
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "English Book"
+        
+        guard let words = StorageManager.shared.fetchData() else { return }
+        wordsCoreData = words
+        getWordsFromCoreData(wordsIKnow: wordsCoreData)
+        
+        
+        title = nameBook
         view.backgroundColor = .systemBackground
         collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
+        allPagesLabel.text = "\(pagesOfBook.count) pages"
         
         view.addSubview(collectionView)
         view.addSubview(nextPageButton)
         view.addSubview(backPageButton)
-        
-        setConstraints()
-        
+        view.addSubview(allPagesLabel)
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        componentsOfText = divisionIntoParts(this: mainText)
-        addingSpacerForLine(array: componentsOfText)
+        setConstraints()
+        componentsOfPage = divisionIntoParts(this: pagesOfBook[currentPage - 1])
+        addingSpacerForLine()
         createArrayWidthCell()
+        
+        nextPageButton.addTarget(self, action: #selector(nextPageButtonTap), for: .touchUpInside)
+        backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
+    }
+    
+    private func getWordsFromCoreData(wordsIKnow: [WordIKnow]) {
+        wordsIKnow.forEach { wordIKnow in
+            selectedWords.append(wordIKnow.word ?? "")
+        }
+    }
+    
+    @objc private func nextPageButtonTap() {
+        currentPage += 1
+        
+    }
+    @objc private func backPageButtonTap() {
+        currentPage -= 1
     }
     
     private func createArrayWidthCell() {
-        for component in componentsOfText {
+        sizesForCells.removeAll()
+        for component in componentsOfPage {
             labelForCountingWidthCell.text = component
             labelForCountingWidthCell.sizeToFit()
             sizesForCells.append(labelForCountingWidthCell.frame.width)
         }
     }
     
-    private func addingSpacerForLine(array: [String]) {
+    private func addingSpacerForLine() {
         
-        for index in 0...componentsOfText.count - 1 {
+        for index in 0...componentsOfPage.count - 1 {
             
-            value += componentsOfText[index].count
+            value += componentsOfPage[index].count
             
             if value > 31 {
                 let x = 31 - counterOneLine
+                guard x > 0 else { return }
                 for _ in 0...x {
-                    componentsOfText[index - 1] += " "
+                    componentsOfPage[index - 1] += " "
                 }
                 counterOneLine = 0
-                value = componentsOfText[index].count
+                value = componentsOfPage[index].count
             }
-            counterOneLine += componentsOfText[index].count
+            counterOneLine += componentsOfPage[index].count
         }
     }
     
@@ -117,16 +159,32 @@ Be careful to focus on the proper things. For an actor, it can be tempting to ge
 extension PageViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        componentsOfText.count
+        componentsOfPage.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as! WordCollectionViewCell
         
-        let word = removePunctuationMarks(this: componentsOfText[indexPath.row].lowercased())
-        cell.configure(with: componentsOfText[indexPath.row], sizeMask: gesSizeMask(text: word))
-        cell.maskTextView.backgroundColor = selectedWords.contains(word) ? #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
+        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        cell.configure(with: componentsOfPage[indexPath.row], sizeMask: gesSizeMask(text: word))
         
+        
+        var isContains = false
+        
+        for wordCoreData in wordsCoreData {
+            if wordCoreData.word == word {
+                cell.maskTextView.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1)
+                isContains.toggle()
+                break
+            }
+        }
+        
+        if !isContains {
+            cell.maskTextView.backgroundColor = #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
+        }
+        
+//        cell.maskTextView.backgroundColor = selectedWords.contains(word) ? #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
+        cell.backgroundColor = .systemGray
         return cell
     }
     
@@ -138,18 +196,46 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let word = removePunctuationMarks(this: componentsOfText[indexPath.row].lowercased())
+        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+//        print(indexPath.row)
         
-        if !selectedWords.contains(word) {
-            selectedWords.append(word)
-        } else {
-            let indexFind = selectedWords.firstIndex(of: word) ?? 0
-            selectedWords.remove(at: indexFind)
+//        if !selectedWords.contains(word) {
+//            selectedWords.append(word)
+//
+//        } else {
+//            let indexFind = selectedWords.firstIndex(of: word) ?? 0
+//            selectedWords.remove(at: indexFind)
+//        }
+//
+//        collectionView.reloadData()
+
+        print(word)
+        
+        var isContains = false
+        
+        for wordIKnow in wordsCoreData {
+            if wordIKnow.word == word {
+                StorageManager.shared.delete(wordIKnow)
+                let indexFind = wordsCoreData.firstIndex(of: wordIKnow)
+                wordsCoreData.remove(at: indexFind ?? 0)
+                print("удалил по индексу \(indexFind)")
+                isContains = true
+                break
+            }
         }
+        
+            if !isContains {
+        guard let wordCoreData = StorageManager.shared.save(title: word) else { return }
+        wordsCoreData.append(wordCoreData)
+        print("добавил элемент")
+     
+        }
+        print("всего \(wordsCoreData.count)")
         collectionView.reloadData()
-    }
-    
+        }
 }
+
+  
 
 extension PageViewController: UICollectionViewDelegateFlowLayout {
     
@@ -181,6 +267,11 @@ extension PageViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -120)
+        ])
+        
+        NSLayoutConstraint.activate([
+            allPagesLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
+            allPagesLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         
         NSLayoutConstraint.activate([

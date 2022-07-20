@@ -45,6 +45,7 @@ class DetailViewController: UIViewController {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Читать", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
         button.backgroundColor = .red
         button.layer.borderWidth = 1
         button.isHidden = true
@@ -64,13 +65,16 @@ class DetailViewController: UIViewController {
      downloadButton.frame.origin
     }()
     
-   
-    
     var mainText = "" {
         didSet {
                openPageVCButton.isHidden = false
+//               divideTextIntoPages(text: mainText)
         }
     }
+    var pagesOfBook: [String] = []
+    var finishDiverse = false
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,20 +103,38 @@ Author: \(result.authors?.first?.name ?? "")
         view.addSubview(openPageVCButton)
         view.addSubview(progressMask)
         
-        
-        downloadButton.addTarget(self, action: #selector(DownloadButtonAction), for: .touchUpInside)
+        downloadButton.addTarget(self, action: #selector(downloadButtonAction), for: .touchUpInside)
         openPageVCButton.addTarget(self, action: #selector(openPageVCButtonAction), for: .touchUpInside)
         setImage()
         setConstrains()
     }
     
+    
+    
     @objc private func openPageVCButtonAction() {
-        let pageVC = PageViewController()
-        pageVC.mainText = mainText
-        navigationController?.pushViewController(pageVC, animated: true)
+        progressMask.isHidden = false
+        openPageVCButton.backgroundColor = .white
+        
+        divideTextIntoPages(
+            text: mainText,
+            progressForMask: { [weak self] progress in
+                self?.progressMask.frame = CGRect(x: self?.openPageVCButton.frame.origin.x ?? 0,
+                                                y: self?.openPageVCButton.frame.origin.y ?? 0,
+                                                width: (self?.openPageVCButton.frame.width ?? 0) * progress / 100,
+                                                height: 50)
+                self?.openPageVCButton.setTitle("\(Int(progress)) % completed", for: .normal)
+            },
+            completion: { [weak self] pagesOfBook in
+                self?.pagesOfBook = pagesOfBook
+                
+                let pageVC = PageViewController()
+                pageVC.pagesOfBook = self?.pagesOfBook ?? []
+                pageVC.nameBook = self?.result.title ?? ""
+                self?.navigationController?.pushViewController(pageVC, animated: true) }
+        )
     }
     
-    @objc private func DownloadButtonAction() {
+    @objc private func downloadButtonAction() {
         progressMask.isHidden = false
         downloadButton.backgroundColor = .white
         downloadButton.setTitle("0 % completed", for: .normal)
@@ -120,9 +142,9 @@ Author: \(result.authors?.first?.name ?? "")
         guard let url = result.formats.textPlainCharsetUtf8 else { return }
         NetworkManage.shared.fetchDataFrom(url: url) { progress in
             self.progressMask.frame = CGRect(x: 0,
-                                          y: 0,
-                                        width: self.downloadButton.frame.width * CGFloat(progress.fractionCompleted),
-                                        height: 50)
+                                           y: 0,
+                                           width: self.downloadButton.frame.width * CGFloat(progress.fractionCompleted),
+                                           height: 50)
             self.progressMask.frame.origin = self.originalPosition
             self.downloadButton.setTitle(progress.localizedDescription, for: .normal)
             
@@ -134,6 +156,38 @@ Author: \(result.authors?.first?.name ?? "")
             self.mainText = String(data: data, encoding: .utf8) ?? ""
         }
     }
+    
+    private func divideTextIntoPages(text: String, progressForMask: @escaping(CGFloat) -> Void, completion: @escaping([String]) -> Void) {
+        
+        DispatchQueue.global().async {
+            var pagesOfBook: [String] = []
+            
+            let diverseCount = Int(text.count / 450)
+            var location = 0
+            
+            let valueOnePercent = CGFloat(100)/CGFloat(diverseCount)
+            var counter = 0
+            
+            for _ in 0..<diverseCount - 1 {
+                
+                pagesOfBook.append(String(
+                    text[text.index(text.startIndex, offsetBy: location)..<text.index(text.startIndex, offsetBy: location + 450)]
+                ))
+                
+                location += 450
+                counter += 1
+                
+                DispatchQueue.main.async {
+                    progressForMask((CGFloat(counter) * valueOnePercent))
+                }
+            }
+            
+            DispatchQueue.main.async {
+                completion(pagesOfBook)
+            }
+        }
+    }
+    
     
     private func checkZip(string: String?) -> Bool {
         guard let stringURL = result.formats.textPlainCharsetUtf8 else { return false}
