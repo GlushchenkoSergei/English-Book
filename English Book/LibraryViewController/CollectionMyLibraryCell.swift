@@ -13,14 +13,14 @@ class CollectionMyLibraryCell: UICollectionViewCell {
     
     let imageViewBook: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
     let nameBookLabel: UILabel = {
         let label = UILabel()
         label.text = "text"
-        label.font = UIFont.monospacedSystemFont(ofSize: 10, weight: .black)
+        label.font = UIFont.monospacedSystemFont(ofSize: 12, weight: .black)
         label.contentMode = .left
         return label
     }()
@@ -37,13 +37,18 @@ class CollectionMyLibraryCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        imageViewBook.frame = CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height - 30)
+        imageViewBook.frame = CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height - 20)
         nameBookLabel.frame = CGRect(x: 0, y: imageViewBook.frame.height + 10, width: contentView.frame.width, height: 20)
     }
     
     func configure(with dataImage: Data?, title: String) {
         guard let dataImage = dataImage else { return }
         imageViewBook.image = UIImage(data: dataImage)
+        nameBookLabel.text = title
+    }
+    
+    func configure(with namedImage: String, title: String) {
+        imageViewBook.image = UIImage(named: namedImage)
         nameBookLabel.text = title
     }
     

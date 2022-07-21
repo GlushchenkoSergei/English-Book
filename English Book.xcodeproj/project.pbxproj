@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0477C3522882BD9E0013C5A3 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3512882BD9E0013C5A3 /* MainViewController.swift */; };
+		0477C3522882BD9E0013C5A3 /* LibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */; };
 		0477C3542882C51E0013C5A3 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3532882C51E0013C5A3 /* Point.swift */; };
 		0477C3582882C6880013C5A3 /* Extension + UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3572882C6880013C5A3 /* Extension + UIView.swift */; };
 		0482F0AC28815A0900EB5F62 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 0482F0AB28815A0900EB5F62 /* .gitignore */; };
@@ -21,6 +21,8 @@
 		049559F7287C68F200B482F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 049559F6287C68F200B482F8 /* Assets.xcassets */; };
 		049559FA287C68F200B482F8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 049559F8287C68F200B482F8 /* LaunchScreen.storyboard */; };
 		049F0CB7288943540061538C /* CollectionMyLibraryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049F0CB6288943540061538C /* CollectionMyLibraryCell.swift */; };
+		049F0CB928896E4A0061538C /* StartTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049F0CB828896E4A0061538C /* StartTabBarController.swift */; };
+		049F0CBB28896F5E0061538C /* DictionaryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049F0CBA28896F5E0061538C /* DictionaryTableViewController.swift */; };
 		04A87175288889AF00A719DD /* English Book.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 04A87173288889AF00A719DD /* English Book.xcdatamodeld */; };
 		04A8717A28888DEB00A719DD /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A8717928888DEB00A719DD /* StorageManager.swift */; };
 		04A8B4DD287D90060012A9E1 /* WordCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A8B4DC287D90060012A9E1 /* WordCollectionViewCell.swift */; };
@@ -28,7 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0477C3512882BD9E0013C5A3 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewController.swift; sourceTree = "<group>"; };
 		0477C3532882C51E0013C5A3 /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
 		0477C3572882C6880013C5A3 /* Extension + UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension + UIView.swift"; sourceTree = "<group>"; };
 		0482F0AB28815A0900EB5F62 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
@@ -44,6 +46,8 @@
 		049559F9287C68F200B482F8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		049559FB287C68F200B482F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		049F0CB6288943540061538C /* CollectionMyLibraryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionMyLibraryCell.swift; sourceTree = "<group>"; };
+		049F0CB828896E4A0061538C /* StartTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartTabBarController.swift; sourceTree = "<group>"; };
+		049F0CBA28896F5E0061538C /* DictionaryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryTableViewController.swift; sourceTree = "<group>"; };
 		04A87174288889AF00A719DD /* English Book.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "English Book.xcdatamodel"; sourceTree = "<group>"; };
 		04A8717928888DEB00A719DD /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		04A8B4DC287D90060012A9E1 /* WordCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -133,9 +137,11 @@
 				0482F0B128815EF500EB5F62 /* Model */,
 				0477C3562882C6660013C5A3 /* Extensions */,
 				0477C3552882C5DB0013C5A3 /* Helpers */,
+				049F0CB828896E4A0061538C /* StartTabBarController.swift */,
 				049F0CB4288942DD0061538C /* PageViewController */,
-				049F0CB5288943170061538C /* MainViewController */,
+				049F0CB5288943170061538C /* LibraryViewController */,
 				0482F0AD28815A8700EB5F62 /* SearchViewController.swift */,
+				049F0CBA28896F5E0061538C /* DictionaryTableViewController.swift */,
 				0482F0B8288187DD00EB5F62 /* DetailViewController.swift */,
 				04A8717628888D9B00A719DD /* StorageManager */,
 				0482F0B328815F6D00EB5F62 /* NetworkManage */,
@@ -154,13 +160,13 @@
 			path = PageViewController;
 			sourceTree = "<group>";
 		};
-		049F0CB5288943170061538C /* MainViewController */ = {
+		049F0CB5288943170061538C /* LibraryViewController */ = {
 			isa = PBXGroup;
 			children = (
-				0477C3512882BD9E0013C5A3 /* MainViewController.swift */,
+				0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */,
 				049F0CB6288943540061538C /* CollectionMyLibraryCell.swift */,
 			);
-			path = MainViewController;
+			path = LibraryViewController;
 			sourceTree = "<group>";
 		};
 		04A8717628888D9B00A719DD /* StorageManager */ = {
@@ -305,6 +311,8 @@
 			files = (
 				0477C3582882C6880013C5A3 /* Extension + UIView.swift in Sources */,
 				04A8B4DD287D90060012A9E1 /* WordCollectionViewCell.swift in Sources */,
+				049F0CB928896E4A0061538C /* StartTabBarController.swift in Sources */,
+				049F0CBB28896F5E0061538C /* DictionaryTableViewController.swift in Sources */,
 				0482F0B72881714A00EB5F62 /* Link.swift in Sources */,
 				0482F0B028815E2300EB5F62 /* NetworkManage.swift in Sources */,
 				049559F2287C68F000B482F8 /* PageViewController.swift in Sources */,
@@ -312,7 +320,7 @@
 				04A87175288889AF00A719DD /* English Book.xcdatamodeld in Sources */,
 				049F0CB7288943540061538C /* CollectionMyLibraryCell.swift in Sources */,
 				0482F0AE28815A8700EB5F62 /* SearchViewController.swift in Sources */,
-				0477C3522882BD9E0013C5A3 /* MainViewController.swift in Sources */,
+				0477C3522882BD9E0013C5A3 /* LibraryViewController.swift in Sources */,
 				049559EE287C68F000B482F8 /* AppDelegate.swift in Sources */,
 				0482F0B9288187DD00EB5F62 /* DetailViewController.swift in Sources */,
 				0477C3542882C51E0013C5A3 /* Point.swift in Sources */,
