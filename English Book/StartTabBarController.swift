@@ -11,6 +11,7 @@ class StartTabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemBackground
         let libraryVC = UINavigationController(rootViewController: LibraryViewController())
         libraryVC.title = "Library"
         

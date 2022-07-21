@@ -28,6 +28,7 @@ class DictionaryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemBackground
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Dictionary"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CellWord")

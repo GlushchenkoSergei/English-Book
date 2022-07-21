@@ -148,22 +148,23 @@ class SearchViewController: UIViewController {
     private func setConstrains() {
         
         NSLayoutConstraint.activate([
-            pageCountLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60),
+//            pageCountLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60),
+            pageCountLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0)),
             pageCountLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         
         NSLayoutConstraint.activate([
-            backButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            backButton.bottomAnchor.constraint(equalTo: pageCountLabel.bottomAnchor),
             backButton.trailingAnchor.constraint(equalTo: pageCountLabel.leadingAnchor, constant: -20),
-            backButton.heightAnchor.constraint(equalToConstant: 50),
-            backButton.widthAnchor.constraint(equalToConstant: 50)
+            backButton.heightAnchor.constraint(equalToConstant: 30),
+            backButton.widthAnchor.constraint(equalToConstant: 30)
         ])
         
         NSLayoutConstraint.activate([
-            nextButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
+            nextButton.bottomAnchor.constraint(equalTo: pageCountLabel.bottomAnchor),
             nextButton.leadingAnchor.constraint(equalTo: pageCountLabel.trailingAnchor, constant: 20),
-            nextButton.heightAnchor.constraint(equalToConstant: 50),
-            nextButton.widthAnchor.constraint(equalToConstant: 50)
+            nextButton.heightAnchor.constraint(equalToConstant: 30),
+            nextButton.widthAnchor.constraint(equalToConstant: 30)
         ])
         
         NSLayoutConstraint.activate([

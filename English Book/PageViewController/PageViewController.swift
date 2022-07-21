@@ -25,6 +25,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     private let allPagesLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
+        label.font = UIFont.systemFont(ofSize: 10)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -38,7 +39,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let testView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemCyan
+        view.backgroundColor = .systemBackground
         view.layer.cornerRadius = 10
         view.layer.borderWidth = 2
         view.isHidden = true
@@ -204,7 +205,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         }
         
         
-        cell.backgroundColor = .systemGray
+//        cell.backgroundColor = .systemGray
         return cell
     }
     
@@ -250,7 +251,6 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         testView.isHidden = false
         blurEffectView.isHidden = false
 
-        
         switch locationCollectionView.x {
         case ...CGFloat(testView.frame.width / 2):
             testView.frame.origin.x = locationView.x
@@ -266,8 +266,14 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
             testView.frame.origin.y = locationView.y - testView.bounds.height - 20
         }
         
-//        testView.frame.origin.y = locationView.y - testView.bounds.height
-//        testView.frame.origin.x = locationView.x
+        testView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        
+        UIView.animate(withDuration: 0.2) {
+            self.testView.transform = .identity
+        }
+        
+        
+
         print("_________________________________________")
         print(locationView)
         print("\(testView.frame.width)w;  \(testView.frame.height)h")
@@ -306,30 +312,31 @@ extension PageViewController: UICollectionViewDelegateFlowLayout {
 extension PageViewController {
     
     private func setConstraints() {
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -120)
-        ])
         
         NSLayoutConstraint.activate([
-            allPagesLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
+            allPagesLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
             allPagesLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         
         NSLayoutConstraint.activate([
-            nextPageButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20),
+            nextPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
             nextPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 100),
-            nextPageButton.heightAnchor.constraint(equalToConstant: 50),
-            nextPageButton.widthAnchor.constraint(equalToConstant: 50)
+            nextPageButton.heightAnchor.constraint(equalToConstant: 30),
+            nextPageButton.widthAnchor.constraint(equalToConstant: 30)
         ])
         
         NSLayoutConstraint.activate([
-            backPageButton.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 20),
+            backPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
             backPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -100),
-            backPageButton.heightAnchor.constraint(equalToConstant: 50),
-            backPageButton.widthAnchor.constraint(equalToConstant: 50)
+            backPageButton.heightAnchor.constraint(equalToConstant: 30),
+            backPageButton.widthAnchor.constraint(equalToConstant: 30)
+        ])
+        
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: backPageButton.topAnchor, constant: -20)
         ])
         
     }
