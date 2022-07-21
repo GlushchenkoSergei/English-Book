@@ -46,10 +46,11 @@ class MainViewController: UIViewController {
         return view
     }()
     
-    private let myLibraryButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("My library", for: .normal)
-        return button
+    private let collectionMyLibrary: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+//        collectionView.alwaysBounceVertical = true
+        return collectionView
     }()
     
     private let searchButton: UIButton = {
@@ -73,34 +74,45 @@ class MainViewController: UIViewController {
     private let color3 = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 0.0)
     private let color2 = UIColor(red: 33/255, green: 78/255, blue: 132/255, alpha: 0.40)
     
+    
+    var books: [BookCoreData] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "English Book"
-        addSubview(someViews: [backgroundViewLibrary, backgroundViewDictionary, bottomLabelView,
-                               libraryLabel, myLibraryButton, searchButton, dictionaryLabel,
-                               learnButton, repeatButton])
+        collectionMyLibrary.register(CollectionMyLibraryCell.self, forCellWithReuseIdentifier: CollectionMyLibraryCell.identifier)
+        collectionMyLibrary.dataSource = self
+        collectionMyLibrary.delegate = self
         navigationController?.navigationBar.prefersLargeTitles = true
         view.backgroundColor = .systemBackground
+        
+        addSubview(someViews: [backgroundViewLibrary, backgroundViewDictionary, bottomLabelView,
+                               libraryLabel, searchButton, dictionaryLabel,
+                               learnButton, repeatButton, collectionMyLibrary])
         addTarget()
+        
+        guard let book = StorageManager.shared.fetchDataBook()  else { return }
+        books = book
+//        print(books.count)
+//        print(books.last?.image ?? "")
+//        print(books.last?.title ?? "")
+//        guard let pages = books.last?.page?.allObjects as? [PageCoreData] else { return }
+//        print(pages.first?.page ?? "")
     }
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        setPropertyButtons(buttons: [myLibraryButton, searchButton, repeatButton, learnButton])
+        setPropertyButtons(buttons: [searchButton, repeatButton, learnButton])
         setConstrains()
         addGradients()
     }
     
     private func addTarget() {
-        myLibraryButton.addTarget(self, action: #selector(tapMyLibraryButton), for: .touchUpInside)
         searchButton.addTarget(self, action: #selector(tapSearchButton), for: .touchUpInside)
         repeatButton.addTarget(self, action: #selector(tapRepeatButton), for: .touchUpInside)
         learnButton.addTarget(self, action: #selector(tapLearnButton), for: .touchUpInside)
     }
     
-    @objc private func tapMyLibraryButton() {
-        
-    }
     
     @objc private func tapSearchButton() {
         let searchVC = SearchViewController()
@@ -146,6 +158,51 @@ class MainViewController: UIViewController {
     }
     
 }
+
+extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        print(books.count)
+        return books.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+
+       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionMyLibraryCell.identifier, for: indexPath) as! CollectionMyLibraryCell
+
+        guard let imageURL = books[indexPath.row].image else { return UICollectionViewCell() }
+
+        NetworkManage.shared.fetchResponseFrom(url: imageURL) { response in
+            cell.configure(with: response.data, title: self.books[indexPath.row].title ?? "")
+        }
+        
+        return cell
+    }
+    
+    // Переход на PageVC по выбранной книге
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let book = books[indexPath.row]
+        var pagesOfBook: [String] = []
+        
+        guard let pagesCoreDAta =  book.page?.allObjects as? [PageCoreData] else { return }
+        
+        pagesCoreDAta.forEach { pageCD in
+            pagesOfBook.append(pageCD.page ?? "")
+        }
+        
+        let pageVC = PageViewController()
+        pageVC.nameBook = book.title ?? ""
+        pageVC.pagesOfBook = pagesOfBook
+        navigationController?.pushViewController(pageVC, animated: true)
+    }
+    
+    //Размер ячеек
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        CGSize(width: view.frame.width / 5, height: collectionMyLibrary.frame.height)
+    }
+    
+}
+
 extension MainViewController {
     
     private func setConstrains() {
@@ -162,15 +219,15 @@ extension MainViewController {
         ])
         
         NSLayoutConstraint.activate([
-            myLibraryButton.topAnchor.constraint(equalTo: libraryLabel.topAnchor, constant: 40),
-            myLibraryButton.leadingAnchor.constraint(equalTo: backgroundViewLibrary.leadingAnchor),
-            myLibraryButton.widthAnchor.constraint(equalToConstant: view.bounds.width / 2)
+            searchButton.topAnchor.constraint(equalTo: libraryLabel.topAnchor, constant: 20),
+            searchButton.leadingAnchor.constraint(equalTo: backgroundViewLibrary.leadingAnchor),
+            searchButton.widthAnchor.constraint(equalToConstant: view.bounds.width / 2)
         ])
         
         NSLayoutConstraint.activate([
-            searchButton.topAnchor.constraint(equalTo: libraryLabel.topAnchor, constant: 40),
-            searchButton.leadingAnchor.constraint(equalTo: myLibraryButton.trailingAnchor),
-            searchButton.widthAnchor.constraint(equalToConstant: view.bounds.width / 2)
+            collectionMyLibrary.topAnchor.constraint(equalTo: searchButton.bottomAnchor, constant: 20),
+            collectionMyLibrary.bottomAnchor.constraint(equalTo: backgroundViewLibrary.bottomAnchor, constant: -20),
+            collectionMyLibrary.widthAnchor.constraint(equalTo: backgroundViewLibrary.widthAnchor)
         ])
         
         NSLayoutConstraint.activate([

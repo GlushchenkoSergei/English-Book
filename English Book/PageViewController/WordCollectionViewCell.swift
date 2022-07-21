@@ -25,7 +25,6 @@ class WordCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
-    
     override init(frame: CGRect) {
         super .init(frame: frame)
         contentView.addSubview(maskTextView)

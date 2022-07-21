@@ -68,7 +68,6 @@ class DetailViewController: UIViewController {
     var mainText = "" {
         didSet {
                openPageVCButton.isHidden = false
-//               divideTextIntoPages(text: mainText)
         }
     }
     var pagesOfBook: [String] = []
@@ -126,6 +125,10 @@ Author: \(result.authors?.first?.name ?? "")
             },
             completion: { [weak self] pagesOfBook in
                 self?.pagesOfBook = pagesOfBook
+                
+                StorageManager.shared.saveBook(title: self?.result.title ?? "",
+                                            image: self?.result.formats.imageJPEG ?? "",
+                                            pages: self?.pagesOfBook ?? [])
                 
                 let pageVC = PageViewController()
                 pageVC.pagesOfBook = self?.pagesOfBook ?? []

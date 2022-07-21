@@ -39,6 +39,19 @@ class StorageManager {
         }
     }
     
+    func fetchDataBook() -> [BookCoreData]? {
+        let fetchRequest = BookCoreData.fetchRequest()
+        
+        do {
+            let task = try context.fetch(fetchRequest)
+            return task
+        } catch let error {
+            print(error.localizedDescription)
+            return nil
+        }
+    }
+    
+    
     func save(title: String) -> WordIKnow? {
         guard let entityDescription = NSEntityDescription.entity(forEntityName: "WordIKnow", in: context) else { return nil }
         guard let word = NSManagedObject(entity: entityDescription, insertInto: context) as? WordIKnow else { return nil }
@@ -47,14 +60,47 @@ class StorageManager {
         return word
     }
     
-    
-    func edit(_ word: WordIKnow, newName: String) {
-        word.word = newName
+    func saveBook(title: String, image: String, pages: [String]) {
+        guard let entityDescription = NSEntityDescription.entity(forEntityName: "BookCoreData", in: context) else { return  }
+        guard let book = NSManagedObject(entity: entityDescription, insertInto: context) as? BookCoreData else { return  }
+        book.title = title
+        book.image = image
+        
+        var pagesNS: [PageCoreData] = []
+        
+        
+        pages.forEach { page in
+            guard let pageCoreData = StorageManager.shared.createTypePage() else { return }
+            pageCoreData.page = page
+            pagesNS.append(pageCoreData)
+            print("ffff")
+        }
+        let setPagesNS = Set(pagesNS) as? NSSet
+        book.page = setPagesNS
         saveContext()
+        
+    }
+    
+    
+    
+    func createTypePage() -> PageCoreData? {
+        guard let entityDescription = NSEntityDescription.entity(forEntityName: "PageCoreData", in: context)
+        else { return nil}
+
+        guard let pageCoreData = NSManagedObject(entity: entityDescription,
+                                                insertInto: context) as? PageCoreData
+        else { return nil}
+
+        return pageCoreData
     }
     
     func delete(_ word: WordIKnow) {
         context.delete(word)
+        saveContext()
+    }
+    
+    func delete(_ book: BookCoreData) {
+        context.delete(book)
         saveContext()
     }
     

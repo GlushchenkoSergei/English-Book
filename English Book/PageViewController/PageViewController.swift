@@ -60,8 +60,6 @@ class PageViewController: UIViewController {
     
     private var componentsOfPage: [String] = []
     private var sizesForCells: [Double] = []
-    private var selectedWords: [String] = []
-    
     
     private var wordsCoreData: [WordIKnow] = []
     
@@ -71,8 +69,7 @@ class PageViewController: UIViewController {
         
         guard let words = StorageManager.shared.fetchData() else { return }
         wordsCoreData = words
-        getWordsFromCoreData(wordsIKnow: wordsCoreData)
-        
+
         
         title = nameBook
         view.backgroundColor = .systemBackground
@@ -95,18 +92,22 @@ class PageViewController: UIViewController {
         backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
     }
     
-    private func getWordsFromCoreData(wordsIKnow: [WordIKnow]) {
-        wordsIKnow.forEach { wordIKnow in
-            selectedWords.append(wordIKnow.word ?? "")
+//    private func getWordsFromCoreData(wordsIKnow: [WordIKnow]) {
+//        wordsIKnow.forEach { wordIKnow in
+//            selectedWords.append(wordIKnow.word ?? "")
+//        }
+//    }
+    
+    @objc private func nextPageButtonTap() {
+        if currentPage < pagesOfBook.count {
+        currentPage += 1
         }
     }
     
-    @objc private func nextPageButtonTap() {
-        currentPage += 1
-        
-    }
     @objc private func backPageButtonTap() {
+        if currentPage != 1 {
         currentPage -= 1
+        }
     }
     
     private func createArrayWidthCell() {
@@ -218,7 +219,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
                 StorageManager.shared.delete(wordIKnow)
                 let indexFind = wordsCoreData.firstIndex(of: wordIKnow)
                 wordsCoreData.remove(at: indexFind ?? 0)
-                print("удалил по индексу \(indexFind)")
+//                print("удалил по индексу \(indexFind)")
                 isContains = true
                 break
             }
