@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PageViewController: UIViewController {
+class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -34,6 +34,15 @@ class PageViewController: UIViewController {
         button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.backward"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
+    }()
+    
+    private let testView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemCyan
+        view.layer.cornerRadius = 10
+        view.layer.borderWidth = 2
+        view.isHidden = true
+        return view
     }()
     
     var pagesOfBook: [String] = []
@@ -63,13 +72,13 @@ class PageViewController: UIViewController {
     
     private var wordsCoreData: [WordIKnow] = []
     
+    let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: UIBlurEffect.Style.systemUltraThinMaterialDark))
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         guard let words = StorageManager.shared.fetchData() else { return }
         wordsCoreData = words
-
         
         title = nameBook
         view.backgroundColor = .systemBackground
@@ -80,6 +89,16 @@ class PageViewController: UIViewController {
         view.addSubview(nextPageButton)
         view.addSubview(backPageButton)
         view.addSubview(allPagesLabel)
+        
+
+        blurEffectView.isHidden = true
+        blurEffectView.alpha = 0.9
+        blurEffectView.frame = view.bounds
+        view.addSubview(blurEffectView)
+        
+        view.addSubview(testView)
+        testView.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 2, height: view.bounds.height / 5)
+        
         collectionView.delegate = self
         collectionView.dataSource = self
         
@@ -90,13 +109,13 @@ class PageViewController: UIViewController {
         
         nextPageButton.addTarget(self, action: #selector(nextPageButtonTap), for: .touchUpInside)
         backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
+        
+        
+        let testGesture = UITapGestureRecognizer(target: self, action: #selector(testTapGesture(sender: )))
+        testGesture.delegate = self
+        
+        collectionView.addGestureRecognizer(testGesture)
     }
-    
-//    private func getWordsFromCoreData(wordsIKnow: [WordIKnow]) {
-//        wordsIKnow.forEach { wordIKnow in
-//            selectedWords.append(wordIKnow.word ?? "")
-//        }
-//    }
     
     @objc private func nextPageButtonTap() {
         if currentPage < pagesOfBook.count {
@@ -184,7 +203,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
             cell.maskTextView.backgroundColor = #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
         }
         
-//        cell.maskTextView.backgroundColor = selectedWords.contains(word) ? #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
+        
         cell.backgroundColor = .systemGray
         return cell
     }
@@ -196,21 +215,10 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         return size
     }
     
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
-//        print(indexPath.row)
-        
-//        if !selectedWords.contains(word) {
-//            selectedWords.append(word)
-//
-//        } else {
-//            let indexFind = selectedWords.firstIndex(of: word) ?? 0
-//            selectedWords.remove(at: indexFind)
-//        }
-//
-//        collectionView.reloadData()
 
-        print(word)
         
         var isContains = false
         
@@ -219,7 +227,6 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
                 StorageManager.shared.delete(wordIKnow)
                 let indexFind = wordsCoreData.firstIndex(of: wordIKnow)
                 wordsCoreData.remove(at: indexFind ?? 0)
-//                print("удалил по индексу \(indexFind)")
                 isContains = true
                 break
             }
@@ -228,12 +235,48 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
             if !isContains {
         guard let wordCoreData = StorageManager.shared.save(title: word) else { return }
         wordsCoreData.append(wordCoreData)
-        print("добавил элемент")
-     
         }
-        print("всего \(wordsCoreData.count)")
+        print("стандартное ДАйствие ")
         collectionView.reloadData()
+       
         }
+
+    
+    @objc private func testTapGesture(sender: UILongPressGestureRecognizer) {
+        
+        let locationView = sender.location(in: view)
+        let locationCollectionView = sender.location(in: collectionView)
+
+        testView.isHidden = false
+        blurEffectView.isHidden = false
+
+        
+        switch locationCollectionView.x {
+        case ...CGFloat(testView.frame.width / 2):
+            testView.frame.origin.x = locationView.x
+        case CGFloat(testView.frame.width / 2) + 1...view.bounds.width - testView.frame.width / 2:
+            testView.frame.origin.x = locationView.x - testView.frame.width / 2
+        default:
+            testView.frame.origin.x = locationView.x - testView.frame.width
+        }
+        
+        switch locationCollectionView.y {
+        case ...testView.frame.height:  testView.frame.origin.y = locationView.y + 20
+        default:
+            testView.frame.origin.y = locationView.y - testView.bounds.height - 20
+        }
+        
+//        testView.frame.origin.y = locationView.y - testView.bounds.height
+//        testView.frame.origin.x = locationView.x
+        print("_________________________________________")
+        print(locationView)
+        print("\(testView.frame.width)w;  \(testView.frame.height)h")
+        
+        guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
+//        print(componentsOfPage[indexPath.row])
+    }
+    
+    
 }
 
   
