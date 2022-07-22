@@ -37,10 +37,11 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         return button
     }()
     
-    private let testView: UIView = {
+    private let detailViewWord: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBackground
-        view.layer.cornerRadius = 10
+        view.backgroundColor = .systemGray2
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 20
         view.layer.borderWidth = 2
         view.isHidden = true
         return view
@@ -67,14 +68,22 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let iKnowButton: UIButton = {
         let button = UIButton()
+        button.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1)
         button.setTitle("i know", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
+        button.layer.borderWidth = 1
+        button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     private let learnButton: UIButton = {
         let button = UIButton()
+        button.backgroundColor = #colorLiteral(red: 0.3647058904, green: 0.06666667014, blue: 0.9686274529, alpha: 1)
         button.setTitle("learn", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
+        button.layer.borderWidth = 1
+        button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -106,7 +115,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private var wordsCoreData: [WordIKnow] = []
     
-//    let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: UIBlurEffect.Style.systemUltraThinMaterialDark))
+    private var indexPathForSelectedItem: IndexPath?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -125,16 +134,14 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addSubview(allPagesLabel)
         
 
-//        blurEffectView.isHidden = true
-//        blurEffectView.alpha = 0.9
-//        blurEffectView.frame = view.bounds
-//        view.addSubview(blurEffectView)
-        
-        view.addSubview(testView)
+
+        view.addSubview(detailViewWord)
         view.addSubview(translateWord)
         view.addSubview(originalWord)
-//        testView.frame =
-        testView.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: view.bounds.height / 5)
+        detailViewWord.addSubview(iKnowButton)
+        detailViewWord.addSubview(learnButton)
+
+        detailViewWord.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: view.bounds.height / 5)
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -147,6 +154,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         nextPageButton.addTarget(self, action: #selector(nextPageButtonTap), for: .touchUpInside)
         backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
         
+        iKnowButton.addTarget(self, action: #selector(iKnowButtonTap), for: .touchUpInside)
+        learnButton.addTarget(self, action: #selector(learnButtonTap), for: .touchUpInside)
         
         let testGesture = UITapGestureRecognizer(target: self, action: #selector(testTapGesture(sender: )))
         testGesture.delegate = self
@@ -213,6 +222,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
 }
 
+// MARK: - UICollectionViewDataSource, UICollectionViewDelegate
 extension PageViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -252,11 +262,36 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         return size
     }
     
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
-
+    // MARK: - Modifide testTapGesture of CollectionView
+    @objc private func testTapGesture(sender: UILongPressGestureRecognizer) {
         
+        let locationView = sender.location(in: view)
+        let locationCollectionView = sender.location(in: collectionView)
+
+        guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
+        indexPathForSelectedItem = indexPath
+        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        
+        detailViewWord.isHidden.toggle()
+        translateWord.isHidden.toggle()
+        originalWord.isHidden.toggle()
+        learnButton.isHidden.toggle()
+        iKnowButton.isHidden.toggle()
+
+        setPositionDetailViewWord(locationCollectionView, locationView)
+        detailViewWord.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        
+        UIView.animate(withDuration: 0.2) { self.detailViewWord.transform = .identity }
+
+        originalWord.text = word
+        translateWord.text = TranslateManager.translate(word: word)
+    }
+    
+    
+    @objc private func iKnowButtonTap() {
+        guard let indexPath = indexPathForSelectedItem else { return }
+        
+        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         var isContains = false
         
         for wordIKnow in wordsCoreData {
@@ -273,63 +308,42 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         guard let wordCoreData = StorageManager.shared.save(title: word) else { return }
         wordsCoreData.append(wordCoreData)
         }
-        print("стандартное ДАйствие ")
-        collectionView.reloadData()
-       
-        }
-
     
-    @objc private func testTapGesture(sender: UILongPressGestureRecognizer) {
+        collectionView.reloadData()
         
-        testView.isHidden = false
-        translateWord.isHidden = false
-        originalWord.isHidden = false
+        detailViewWord.isHidden.toggle()
+        translateWord.isHidden.toggle()
+        originalWord.isHidden.toggle()
+        learnButton.isHidden.toggle()
+        iKnowButton.isHidden.toggle()
+    }
+    
+    @objc private func learnButtonTap() {
         
-        let locationView = sender.location(in: view)
-        let locationCollectionView = sender.location(in: collectionView)
-
+    }
+    
+    private func setPositionDetailViewWord(_ locationCollectionView: CGPoint, _ locationView: CGPoint) {
         
-//        blurEffectView.isHidden = false
-
         switch locationCollectionView.x {
-        case ...CGFloat(testView.frame.width / 2):
-            testView.frame.origin.x = locationView.x
-        case CGFloat(testView.frame.width / 2) + 1...view.bounds.width - testView.frame.width / 2:
-            testView.frame.origin.x = locationView.x - testView.frame.width / 2
+        case ...CGFloat(detailViewWord.frame.width / 2):
+            detailViewWord.frame.origin.x = locationView.x
+        case CGFloat(detailViewWord.frame.width / 2) + 1...view.bounds.width - detailViewWord.frame.width / 2:
+            detailViewWord.frame.origin.x = locationView.x - detailViewWord.frame.width / 2
         default:
-            testView.frame.origin.x = locationView.x - testView.frame.width
+            detailViewWord.frame.origin.x = locationView.x - detailViewWord.frame.width
         }
         
         switch locationCollectionView.y {
-        case ...testView.frame.height:  testView.frame.origin.y = locationView.y + 20
+        case ...detailViewWord.frame.height:  detailViewWord.frame.origin.y = locationView.y + 20
         default:
-            testView.frame.origin.y = locationView.y - testView.bounds.height - 20
+            detailViewWord.frame.origin.y = locationView.y - detailViewWord.bounds.height - 20
         }
-        
-        testView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        
-        UIView.animate(withDuration: 0.2) {
-            self.testView.transform = .identity
-        }
-        
-
-        guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
-        
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
-        
-        print(word)
-        
-        originalWord.text = word
-        
-//        guard let prepareForTranslate = componentsOfPage[indexPath.row].components(separatedBy: " ").first?.lowercased() else { return }
-        translateWord.text = TranslateManager.translate(word: word)
     }
-    
     
 }
 
   
-
+// MARK: - UICollectionViewDelegateFlowLayout
 extension PageViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -351,7 +365,8 @@ extension PageViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// Set constraints
+
+// MARK: - Set constraints
 extension PageViewController {
     
     private func setConstraints() {
@@ -383,13 +398,29 @@ extension PageViewController {
         ])
         
         NSLayoutConstraint.activate([
-            originalWord.topAnchor.constraint(equalTo: testView.topAnchor, constant: 30),
-            originalWord.centerXAnchor.constraint(equalTo: testView.centerXAnchor)
+            originalWord.topAnchor.constraint(equalTo: detailViewWord.topAnchor, constant: 20),
+            originalWord.centerXAnchor.constraint(equalTo: detailViewWord.centerXAnchor),
+            originalWord.heightAnchor.constraint(equalToConstant: detailViewWord.frame.height / 6)
         ])
         
         NSLayoutConstraint.activate([
-            translateWord.topAnchor.constraint(equalTo: originalWord.bottomAnchor, constant: 30),
-            translateWord.centerXAnchor.constraint(equalTo: testView.centerXAnchor)
+            translateWord.topAnchor.constraint(equalTo: originalWord.bottomAnchor, constant: 20),
+            translateWord.centerXAnchor.constraint(equalTo: detailViewWord.centerXAnchor),
+            translateWord.heightAnchor.constraint(equalToConstant: detailViewWord.frame.height / 6)
+        ])
+        
+        NSLayoutConstraint.activate([
+            iKnowButton.topAnchor.constraint(equalTo: translateWord.bottomAnchor, constant: 25),
+            iKnowButton.leadingAnchor.constraint(equalTo: detailViewWord.leadingAnchor),
+            iKnowButton.widthAnchor.constraint(equalToConstant: detailViewWord.frame.width / 2),
+            iKnowButton.bottomAnchor.constraint(equalTo: detailViewWord.bottomAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+            learnButton.topAnchor.constraint(equalTo: iKnowButton.topAnchor),
+            learnButton.trailingAnchor.constraint(equalTo: detailViewWord.trailingAnchor),
+            learnButton.widthAnchor.constraint(equalToConstant: detailViewWord.frame.width / 2),
+            learnButton.bottomAnchor.constraint(equalTo: detailViewWord.bottomAnchor)
         ])
         
     }

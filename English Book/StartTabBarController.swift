@@ -23,7 +23,6 @@ class StartTabBarController: UITabBarController {
         guard let items = tabBar.items else { return }
         items[0].image = UIImage(systemName: "books.vertical.fill")
         items[1].image = UIImage(systemName: "text.bubble.fill")
-//        print(TranslateManager.translate(word: "recognis"))
     }
     
 }
