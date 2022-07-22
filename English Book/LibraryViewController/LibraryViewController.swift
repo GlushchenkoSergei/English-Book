@@ -88,6 +88,13 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
                 pagesOfBook.append(pageCD.page ?? "")
             }
             
+            
+//            print(pagesCoreDAta.last!.page!)
+//            print("_____________________________________________________")
+//            print(pagesCoreDAta.first!.page!)
+            
+            
+            
             let pageVC = PageViewController()
             pageVC.nameBook = book.title ?? ""
             pageVC.pagesOfBook = pagesOfBook

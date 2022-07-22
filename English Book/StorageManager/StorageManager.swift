@@ -73,9 +73,14 @@ class StorageManager {
             guard let pageCoreData = StorageManager.shared.createTypePage() else { return }
             pageCoreData.page = page
             pagesNS.append(pageCoreData)
-            print("ffff")
         }
         let setPagesNS = Set(pagesNS) as? NSSet
+        
+        print(pagesNS.first?.page!)
+        print("---------------------------------------------------------")
+        guard let forPrint = setPagesNS?.allObjects.first as? PageCoreData else { return }
+        print(forPrint.page!)
+        
         book.page = setPagesNS
         saveContext()
         

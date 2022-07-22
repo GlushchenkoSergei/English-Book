@@ -46,6 +46,39 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         return view
     }()
     
+    private let originalWord: UILabel = {
+        let label = UILabel()
+        label.text = "originalWord"
+        label.isHidden = true
+
+        label.font = UIFont.systemFont(ofSize: 20)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let translateWord: UILabel = {
+        let label = UILabel()
+        label.text = "translateWord"
+        label.isHidden = true
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let iKnowButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("i know", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let learnButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("learn", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     var pagesOfBook: [String] = []
     var nameBook = ""
     
@@ -73,7 +106,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private var wordsCoreData: [WordIKnow] = []
     
-    let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: UIBlurEffect.Style.systemUltraThinMaterialDark))
+//    let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: UIBlurEffect.Style.systemUltraThinMaterialDark))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,13 +125,16 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addSubview(allPagesLabel)
         
 
-        blurEffectView.isHidden = true
-        blurEffectView.alpha = 0.9
-        blurEffectView.frame = view.bounds
-        view.addSubview(blurEffectView)
+//        blurEffectView.isHidden = true
+//        blurEffectView.alpha = 0.9
+//        blurEffectView.frame = view.bounds
+//        view.addSubview(blurEffectView)
         
         view.addSubview(testView)
-        testView.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 2, height: view.bounds.height / 5)
+        view.addSubview(translateWord)
+        view.addSubview(originalWord)
+//        testView.frame =
+        testView.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: view.bounds.height / 5)
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -187,7 +223,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as! WordCollectionViewCell
         
         let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
-        cell.configure(with: componentsOfPage[indexPath.row], sizeMask: gesSizeMask(text: word))
+        cell.configure(with: componentsOfPage[indexPath.row], sizeMask: getSizeMask(text: word))
         
         
         var isContains = false
@@ -209,7 +245,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         return cell
     }
     
-    func gesSizeMask(text: String) -> Double {
+    func getSizeMask(text: String) -> Double {
         labelForCountingWidthCell.text = text
         labelForCountingWidthCell.sizeToFit()
         let size = labelForCountingWidthCell.frame.width
@@ -245,11 +281,15 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     @objc private func testTapGesture(sender: UILongPressGestureRecognizer) {
         
+        testView.isHidden = false
+        translateWord.isHidden = false
+        originalWord.isHidden = false
+        
         let locationView = sender.location(in: view)
         let locationCollectionView = sender.location(in: collectionView)
 
-        testView.isHidden = false
-        blurEffectView.isHidden = false
+        
+//        blurEffectView.isHidden = false
 
         switch locationCollectionView.x {
         case ...CGFloat(testView.frame.width / 2):
@@ -272,14 +312,17 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
             self.testView.transform = .identity
         }
         
-        
 
-        print("_________________________________________")
-        print(locationView)
-        print("\(testView.frame.width)w;  \(testView.frame.height)h")
-        
         guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
-//        print(componentsOfPage[indexPath.row])
+        
+        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        
+        print(word)
+        
+        originalWord.text = word
+        
+//        guard let prepareForTranslate = componentsOfPage[indexPath.row].components(separatedBy: " ").first?.lowercased() else { return }
+        translateWord.text = TranslateManager.translate(word: word)
     }
     
     
@@ -337,6 +380,16 @@ extension PageViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: backPageButton.topAnchor, constant: -20)
+        ])
+        
+        NSLayoutConstraint.activate([
+            originalWord.topAnchor.constraint(equalTo: testView.topAnchor, constant: 30),
+            originalWord.centerXAnchor.constraint(equalTo: testView.centerXAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+            translateWord.topAnchor.constraint(equalTo: originalWord.bottomAnchor, constant: 30),
+            translateWord.centerXAnchor.constraint(equalTo: testView.centerXAnchor)
         ])
         
     }
