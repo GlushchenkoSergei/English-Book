@@ -12,7 +12,7 @@ class TestViewController: UIViewController {
     private var iKnowWords: [WordIKnow] = []
     private var learnTheseWords: [LearnWord] = []
     
-    private let cardView: UIView = {
+    private let viewCard: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .white
@@ -56,9 +56,19 @@ class TestViewController: UIViewController {
     
     private let labelWord: UILabel = {
         let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        label.numberOfLines = 0
+        label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    private var wordEn = "" {
+        didSet {
+            wordRu = TranslateManager.translate(word: wordEn) ?? ""
+        }
+    }
+    private var wordRu = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,37 +80,87 @@ class TestViewController: UIViewController {
         view.backgroundColor = .white
         title = "Test"
         
-        view.addSubview(cardView)
+        view.addSubview(viewCard)
         view.addSubview(iKnowButton)
         view.addSubview(forgotButton)
-        view.addSubview(labelWord)
+        viewCard.addSubview(labelWord)
         setConstrains()
         
         labelWord.text = iKnowWords.randomElement()?.word
+        wordEn = labelWord.text ?? ""
         
         iKnowButton.addTarget(self, action: #selector(iKnowButtonTap), for: .touchUpInside)
         forgotButton.addTarget(self, action: #selector(forgotButtonTap), for: .touchUpInside)
+        
+        let testGesture = UITapGestureRecognizer(target: self, action: #selector(testTapGesture(sender: )))
+        viewCard.addGestureRecognizer(testGesture)
     }
     
     @objc private func iKnowButtonTap() {
-        labelWord.text = iKnowWords.randomElement()?.word
+        let value = viewCard.frame.origin.x
+        UIView.animate(withDuration: 0.2,
+                       animations: {
+            self.viewCard.frame.origin = CGPoint(x: -370, y: self.viewCard.frame.origin.y)
+            self.iKnowButton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+        },
+                       completion: { _ in
+            self.labelWord.text = self.iKnowWords.randomElement()?.word
+            self.wordEn = self.labelWord.text ?? ""
+            self.viewCard.frame.origin = CGPoint(x: 370, y: self.viewCard.frame.origin.y)
+            
+            UIView.animate(withDuration: 0.2) {
+                self.iKnowButton.transform = .identity
+                self.viewCard.frame.origin = CGPoint(x: value, y: self.viewCard.frame.origin.y)
+            }
+        })
+        
     }
     
     @objc private func forgotButtonTap() {
-        guard let word = labelWord.text else { return }
+        
+        UIView.animate(withDuration: 0.2) {
+            self.forgotButton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+        } completion: { _ in
+            UIView.animate(withDuration: 0.2) { self.forgotButton.transform = .identity }
+        }
+
     
         for iKnowWord in iKnowWords {
-            if iKnowWord.word == word {
+            if iKnowWord.word == wordRu {
                 StorageManager.shared.delete(iKnowWord)
                 let indexFind = iKnowWords.firstIndex(of: iKnowWord)
                 iKnowWords.remove(at: indexFind ?? 0)
                 break
             }
-            
-            let _ = StorageManager.shared.appendLearnWord(title: word)
-            labelWord.text = iKnowWords.randomElement()?.word
         }
+        let _ = StorageManager.shared.appendLearnWord(title: wordRu)
+        labelWord.text = iKnowWords.randomElement()?.word
+        self.wordEn = self.labelWord.text ?? ""
     }
+    
+    @objc private func testTapGesture(sender: UILongPressGestureRecognizer) {
+        let radians = CGFloat(200 * Double.pi / 180)
+        
+        Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(changeTextLabelWord), userInfo: nil, repeats: false)
+        
+        let rotation = CATransform3DMakeRotation(radians, 0, radians, 0)
+        UIView.animate(withDuration: 0.4) {
+            self.viewCard.layer.transform = rotation
+        } completion: { _ in
+            self.labelWord.transform = .identity
+            self.viewCard.transform = .identity
+        }
+
+    }
+    
+    @objc private func changeTextLabelWord() {
+        labelWord.text = labelWord.text == wordEn ? wordRu : wordEn
+        
+        let radians = CGFloat(200 * Double.pi / 180)
+        let rotation = CATransform3DMakeRotation(radians, 0, radians, 0)
+        labelWord.layer.transform = rotation
+    }
+    
     
 }
 
@@ -108,14 +168,14 @@ extension TestViewController {
     
     private func setConstrains() {
         NSLayoutConstraint.activate([
-            cardView.widthAnchor.constraint(equalToConstant: view.bounds.width / 1.3 ),
-            cardView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            cardView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
-            cardView.heightAnchor.constraint(equalToConstant: view.bounds.height / 4)
+            viewCard.widthAnchor.constraint(equalToConstant: view.bounds.width / 1.3 ),
+            viewCard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            viewCard.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
+            viewCard.heightAnchor.constraint(equalToConstant: view.bounds.height / 4)
         ])
         
         NSLayoutConstraint.activate([
-            iKnowButton.topAnchor.constraint(equalTo: cardView.bottomAnchor, constant: 100),
+            iKnowButton.topAnchor.constraint(equalTo: viewCard.bottomAnchor, constant: 100),
             iKnowButton.widthAnchor.constraint(equalToConstant: view.bounds.width / 1.3),
             iKnowButton.heightAnchor.constraint(equalToConstant: 50),
             iKnowButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
@@ -129,8 +189,9 @@ extension TestViewController {
         ])
         
         NSLayoutConstraint.activate([
-            labelWord.centerXAnchor.constraint(equalTo: cardView.centerXAnchor),
-            labelWord.centerYAnchor.constraint(equalTo: cardView.centerYAnchor)
+            labelWord.centerXAnchor.constraint(equalTo: viewCard.centerXAnchor),
+            labelWord.centerYAnchor.constraint(equalTo: viewCard.centerYAnchor),
+            labelWord.widthAnchor.constraint(equalTo: viewCard.widthAnchor)
         ])
     }
     
