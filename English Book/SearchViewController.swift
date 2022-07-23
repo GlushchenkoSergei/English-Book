@@ -51,6 +51,8 @@ class SearchViewController: UIViewController {
         }
     }
     
+    var delegate: LibraryViewControllerDelegate!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         downloadData()
@@ -205,6 +207,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let detailVC = DetailViewController()
+        detailVC.delegateLibrary = delegate
         detailVC.result = search.results?[indexPath.row]
         navigationController?.pushViewController(detailVC, animated: true)
     }

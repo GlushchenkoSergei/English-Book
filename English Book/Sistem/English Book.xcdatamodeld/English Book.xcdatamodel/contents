@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="BookCoreData" representedClassName="BookCoreData" syncable="YES" codeGenerationType="class">
+        <attribute name="body" optional="YES" attributeType="String"/>
         <attribute name="image" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
-        <relationship name="page" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PageCoreData" inverseName="book" inverseEntity="PageCoreData"/>
     </entity>
     <entity name="LearnWord" representedClassName="LearnWord" syncable="YES" codeGenerationType="class">
         <attribute name="word" optional="YES" attributeType="String"/>
-    </entity>
-    <entity name="PageCoreData" representedClassName="PageCoreData" syncable="YES" codeGenerationType="class">
-        <attribute name="page" optional="YES" attributeType="String"/>
-        <relationship name="book" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BookCoreData" inverseName="page" inverseEntity="BookCoreData"/>
     </entity>
     <entity name="WordIKnow" representedClassName="WordIKnow" syncable="YES" codeGenerationType="class">
         <attribute name="word" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="BookCoreData" positionX="-449.6566772460938" positionY="-100.1424560546875" width="128" height="88"/>
-        <element name="PageCoreData" positionX="-43.9666748046875" positionY="-31.56842041015625" width="128" height="73"/>
-        <element name="WordIKnow" positionX="-115.1456298828125" positionY="-249.906005859375" width="128" height="44"/>
+        <element name="BookCoreData" positionX="-449.6566772460938" positionY="-100.1424560546875" width="128" height="74"/>
         <element name="LearnWord" positionX="-243" positionY="-117" width="128" height="44"/>
+        <element name="WordIKnow" positionX="-115.1456298828125" positionY="-249.906005859375" width="128" height="44"/>
     </elements>
 </model>

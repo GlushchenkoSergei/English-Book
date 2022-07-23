@@ -73,7 +73,7 @@ class DetailViewController: UIViewController {
     var pagesOfBook: [String] = []
     var finishDiverse = false
     
-    
+    var delegateLibrary: LibraryViewControllerDelegate!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -112,9 +112,9 @@ Author: \(result.authors?.first?.name ?? "")
         progressMask.isHidden = false
         openPageVCButton.backgroundColor = .white
         
-        divideTextIntoPages(
+        TextSeparationAssistant.divideTextIntoPages(
             text: mainText,
-            progressForMask: { [weak self] progress in
+            progress: { [weak self] progress in
                 self?.progressMask.frame = CGRect(
                     x: self?.openPageVCButton.frame.origin.x ?? 0,
                     y: self?.openPageVCButton.frame.origin.y ?? 0,
@@ -122,12 +122,10 @@ Author: \(result.authors?.first?.name ?? "")
                     height: 50
                 )
                 self?.openPageVCButton.setTitle("\(Int(progress)) % completed", for: .normal)},
+            
             completion: { [weak self] pagesOfBook in
                 self?.pagesOfBook = pagesOfBook
                 
-                StorageManager.shared.saveBook(title: self?.result.title ?? "",
-                                               image: self?.result.formats.imageJPEG ?? "",
-                                               pages: self?.pagesOfBook ?? [])
                 
                 let pageVC = PageViewController()
                 pageVC.pagesOfBook = self?.pagesOfBook ?? []
@@ -150,43 +148,17 @@ Author: \(result.authors?.first?.name ?? "")
             self.progressMask.frame.origin = self.originalPosition
             self.downloadButton.setTitle(progress.localizedDescription, for: .normal)
             
-        } completion: { data in
+        } completion: { [weak self] data in
             
-            self.progressMask.isHidden = true
-            self.downloadButton.backgroundColor = .systemGray2
-            self.downloadButton.setTitle("Download", for: .normal)
-            self.mainText = String(data: data, encoding: .utf8) ?? ""
-        }
-    }
-    
-    private func divideTextIntoPages(text: String, progressForMask: @escaping(CGFloat) -> Void, completion: @escaping([String]) -> Void) {
-        
-        DispatchQueue.global().async {
-            var pagesOfBook: [String] = []
+            self?.progressMask.isHidden = true
+            self?.downloadButton.backgroundColor = .systemGray2
+            self?.downloadButton.setTitle("Download", for: .normal)
+            self?.mainText = String(data: data, encoding: .utf8) ?? ""
             
-            let diverseCount = Int(text.count / 400)
-            var location = 0
-            
-            let valueOnePercent = CGFloat(100)/CGFloat(diverseCount)
-            var counter = 0
-            
-            for _ in 0..<diverseCount - 1 {
-                
-                pagesOfBook.append(String(
-                    text[text.index(text.startIndex, offsetBy: location)..<text.index(text.startIndex, offsetBy: location + 400)]
-                ))
-                
-                location += 400
-                counter += 1
-                
-                DispatchQueue.main.async {
-                    progressForMask((CGFloat(counter) * valueOnePercent))
-                }
-            }
-            
-            DispatchQueue.main.async {
-                completion(pagesOfBook)
-            }
+            StorageManager.shared.saveBook(title: self?.result.title ?? "",
+                                        image: self?.result.formats.imageJPEG ?? "",
+                                        body: self?.mainText ?? "")
+            self?.delegateLibrary.savedNewBook()
         }
     }
     
@@ -221,7 +193,7 @@ Author: \(result.authors?.first?.name ?? "")
         ])
         
         NSLayoutConstraint.activate([
-            downloadButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -150),
+            downloadButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -250),
             downloadButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             downloadButton.widthAnchor.constraint(equalToConstant: 250),
             downloadButton.heightAnchor.constraint(equalToConstant: 50)

@@ -12,7 +12,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.isScrollEnabled = false
+//        collectionView.isScrollEnabled = false
         return collectionView
     }()
     
@@ -164,15 +164,11 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @objc private func nextPageButtonTap() {
-        if currentPage < pagesOfBook.count {
-        currentPage += 1
-        }
+        if currentPage < pagesOfBook.count { currentPage += 1 }
     }
     
     @objc private func backPageButtonTap() {
-        if currentPage != 1 {
-        currentPage -= 1
-        }
+        if currentPage != 1 { currentPage -= 1 }
     }
     
     private func createArrayWidthCell() {
@@ -283,6 +279,15 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         var isContains = false
         
+        for wordLearn in learnTheseWords {
+            if wordLearn.word == word {
+                StorageManager.shared.delete(wordLearn)
+                let indexFind = learnTheseWords.firstIndex(of: wordLearn)
+                learnTheseWords.remove(at: indexFind ?? 0)
+                break
+            }
+        }
+        
         for wordIKnow in iKnowTheseWords {
             if wordIKnow.word == word {
                 StorageManager.shared.delete(wordIKnow)
@@ -307,6 +312,16 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         
         let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         let containerLearn = learnTheseWords.filter { $0.word == word }
+        
+        
+        for wordIKnow in iKnowTheseWords {
+            if wordIKnow.word == word {
+                StorageManager.shared.delete(wordIKnow)
+                let indexFind = iKnowTheseWords.firstIndex(of: wordIKnow)
+                iKnowTheseWords.remove(at: indexFind ?? 0)
+                break
+            }
+        }
         
         if !containerLearn.isEmpty {
             StorageManager.shared.delete(containerLearn.first!)

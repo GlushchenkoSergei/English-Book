@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol LibraryViewControllerDelegate {
+    func savedNewBook()
+}
+
 class LibraryViewController: UIViewController {
     
     private let bottomLabelView: UIView = {
@@ -24,6 +28,12 @@ class LibraryViewController: UIViewController {
         return collectionView
     }()
     
+    private let progressView: UIProgressView = {
+        let progressView = UIProgressView()
+        progressView.isHidden = true
+        return progressView
+    }()
+    
     var books: [BookCoreData] = []
     
     override func viewDidLoad() {
@@ -37,6 +47,9 @@ class LibraryViewController: UIViewController {
 
         view.addSubview(bottomLabelView)
         view.addSubview(collectionMyLibrary)
+        view.addSubview(progressView)
+        progressView.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: 50)
+        progressView.center = view.center
         
         guard let book = StorageManager.shared.fetchDataBook()  else { return }
         books = book
@@ -77,28 +90,28 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.row == 0 {
             let searchVC = SearchViewController()
+            searchVC.delegate = self
             navigationController?.pushViewController(searchVC, animated: true)
         } else {
+            progressView.isHidden = false
             let book = books[indexPath.row - 1]
             var pagesOfBook: [String] = []
             
-            guard let pagesCoreDAta =  book.page?.allObjects as? [PageCoreData] else { return }
+            TextSeparationAssistant.divideTextIntoPages(
+                text: book.body ?? "",
+                progress: { progress in
+                    self.progressView.setProgress(Float(progress/100), animated: true)
+                },
+                completion: { [weak self] pages in
+                    self?.progressView.isHidden = true
+                    self?.progressView.setProgress(0, animated: true)
+                    pagesOfBook = pages
+                    let pageVC = PageViewController()
+                    pageVC.nameBook = book.title ?? ""
+                    pageVC.pagesOfBook = pagesOfBook
+                    self?.navigationController?.pushViewController(pageVC, animated: true)
+                })
             
-            pagesCoreDAta.forEach { pageCD in
-                pagesOfBook.append(pageCD.page ?? "")
-            }
-            
-            
-//            print(pagesCoreDAta.last!.page!)
-//            print("_____________________________________________________")
-//            print(pagesCoreDAta.first!.page!)
-            
-            
-            
-            let pageVC = PageViewController()
-            pageVC.nameBook = book.title ?? ""
-            pageVC.pagesOfBook = pagesOfBook
-            navigationController?.pushViewController(pageVC, animated: true)
         }
     }
     
@@ -134,6 +147,16 @@ extension LibraryViewController {
         ])
         
     }
+}
+
+extension LibraryViewController: LibraryViewControllerDelegate {
+    
+    func savedNewBook() {
+        guard let book = StorageManager.shared.fetchDataBook()  else { return }
+        books = book
+        collectionMyLibrary.reloadData()
+    }
+    
 }
 
 

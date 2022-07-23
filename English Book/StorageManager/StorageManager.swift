@@ -80,44 +80,18 @@ class StorageManager {
         return word
     }
     
-    func saveBook(title: String, image: String, pages: [String]) {
+    func saveBook(title: String, image: String, body: String) {
         guard let entityDescription = NSEntityDescription.entity(forEntityName: "BookCoreData", in: context) else { return  }
         guard let book = NSManagedObject(entity: entityDescription, insertInto: context) as? BookCoreData else { return  }
         book.title = title
         book.image = image
-        
-        var pagesNS: [PageCoreData] = []
-        
-        
-        pages.forEach { page in
-            guard let pageCoreData = StorageManager.shared.createTypePage() else { return }
-            pageCoreData.page = page
-            pagesNS.append(pageCoreData)
-        }
-        let setPagesNS = Set(pagesNS) as? NSSet
+        book.body = body
         
 //        print(pagesNS.first?.page!)
-        print("---------------------------------------------------------")
-        guard let forPrint = setPagesNS?.allObjects.first as? PageCoreData else { return }
-        print(forPrint.page!)
-        
-        book.page = setPagesNS
         saveContext()
         
     }
     
-    
-    
-    func createTypePage() -> PageCoreData? {
-        guard let entityDescription = NSEntityDescription.entity(forEntityName: "PageCoreData", in: context)
-        else { return nil}
-
-        guard let pageCoreData = NSManagedObject(entity: entityDescription,
-                                                insertInto: context) as? PageCoreData
-        else { return nil}
-
-        return pageCoreData
-    }
     
     func delete(_ word: WordIKnow) {
         context.delete(word)
