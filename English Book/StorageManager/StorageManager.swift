@@ -27,9 +27,21 @@ class StorageManager {
     
     private init() {}
     
-    func fetchData() -> [WordIKnow]? {
+    func fetchWordsIKnow() -> [WordIKnow]? {
         let fetchRequest = WordIKnow.fetchRequest()
         
+        do {
+            let task = try context.fetch(fetchRequest)
+            return task
+        } catch let error {
+            print(error.localizedDescription)
+            return nil
+        }
+    }
+    
+    func fetchLearnWords() -> [LearnWord]? {
+        let fetchRequest = LearnWord.fetchRequest()
+
         do {
             let task = try context.fetch(fetchRequest)
             return task
@@ -52,9 +64,17 @@ class StorageManager {
     }
     
     
-    func save(title: String) -> WordIKnow? {
+    func appendIKnowWord(title: String) -> WordIKnow? {
         guard let entityDescription = NSEntityDescription.entity(forEntityName: "WordIKnow", in: context) else { return nil }
         guard let word = NSManagedObject(entity: entityDescription, insertInto: context) as? WordIKnow else { return nil }
+        word.word = title
+        saveContext()
+        return word
+    }
+    
+    func appendLearnWord(title: String) -> LearnWord? {
+        guard let entityDescription = NSEntityDescription.entity(forEntityName: "LearnWord", in: context) else { return nil }
+        guard let word = NSManagedObject(entity: entityDescription, insertInto: context) as? LearnWord else { return nil }
         word.word = title
         saveContext()
         return word
@@ -76,7 +96,7 @@ class StorageManager {
         }
         let setPagesNS = Set(pagesNS) as? NSSet
         
-        print(pagesNS.first?.page!)
+//        print(pagesNS.first?.page!)
         print("---------------------------------------------------------")
         guard let forPrint = setPagesNS?.allObjects.first as? PageCoreData else { return }
         print(forPrint.page!)
@@ -100,6 +120,11 @@ class StorageManager {
     }
     
     func delete(_ word: WordIKnow) {
+        context.delete(word)
+        saveContext()
+    }
+    
+    func delete(_ word: LearnWord) {
         context.delete(word)
         saveContext()
     }

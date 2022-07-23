@@ -12,6 +12,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.isScrollEnabled = false
         return collectionView
     }()
     
@@ -51,7 +52,6 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         let label = UILabel()
         label.text = "originalWord"
         label.isHidden = true
-
         label.font = UIFont.systemFont(ofSize: 20)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -62,6 +62,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         label.text = "translateWord"
         label.isHidden = true
         label.font = UIFont.systemFont(ofSize: 14)
+        label.textAlignment = .center
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -79,7 +81,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let learnButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = #colorLiteral(red: 0.3647058904, green: 0.06666667014, blue: 0.9686274529, alpha: 1)
+        button.backgroundColor = #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963)
         button.setTitle("learn", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
         button.layer.borderWidth = 1
@@ -113,38 +115,42 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     private var componentsOfPage: [String] = []
     private var sizesForCells: [Double] = []
     
-    private var wordsCoreData: [WordIKnow] = []
+    private var iKnowTheseWords: [WordIKnow] = []
+    private var learnTheseWords: [LearnWord] = []
     
-    private var indexPathForSelectedItem: IndexPath?
+    private var indexPathItem: IndexPath?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
         
-        guard let words = StorageManager.shared.fetchData() else { return }
-        wordsCoreData = words
+        guard let wordsIKnowCD = StorageManager.shared.fetchWordsIKnow() else { return }
+        iKnowTheseWords = wordsIKnowCD
+        
+        guard let wordsLearnCD = StorageManager.shared.fetchLearnWords() else { return }
+        learnTheseWords = wordsLearnCD
         
         title = nameBook
         view.backgroundColor = .systemBackground
-        collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
+        let testGesture = UITapGestureRecognizer(target: self, action: #selector(testTapGesture(sender: )))
+        collectionView.addGestureRecognizer(testGesture)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        
         allPagesLabel.text = "\(pagesOfBook.count) pages"
         
         view.addSubview(collectionView)
         view.addSubview(nextPageButton)
         view.addSubview(backPageButton)
         view.addSubview(allPagesLabel)
-        
-
-
         view.addSubview(detailViewWord)
-        view.addSubview(translateWord)
-        view.addSubview(originalWord)
+        
+        detailViewWord.addSubview(translateWord)
+        detailViewWord.addSubview(originalWord)
         detailViewWord.addSubview(iKnowButton)
         detailViewWord.addSubview(learnButton)
 
         detailViewWord.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: view.bounds.height / 5)
-        
-        collectionView.delegate = self
-        collectionView.dataSource = self
         
         setConstraints()
         componentsOfPage = divisionIntoParts(this: pagesOfBook[currentPage - 1])
@@ -153,14 +159,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         
         nextPageButton.addTarget(self, action: #selector(nextPageButtonTap), for: .touchUpInside)
         backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
-        
         iKnowButton.addTarget(self, action: #selector(iKnowButtonTap), for: .touchUpInside)
         learnButton.addTarget(self, action: #selector(learnButtonTap), for: .touchUpInside)
-        
-        let testGesture = UITapGestureRecognizer(target: self, action: #selector(testTapGesture(sender: )))
-        testGesture.delegate = self
-        
-        collectionView.addGestureRecognizer(testGesture)
     }
     
     @objc private func nextPageButtonTap() {
@@ -236,20 +236,13 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         cell.configure(with: componentsOfPage[indexPath.row], sizeMask: getSizeMask(text: word))
         
         
-        var isContains = false
+        let containerIKnow = iKnowTheseWords.filter { $0.word == word }
+        cell.maskTextView.backgroundColor = !containerIKnow.isEmpty ? #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
         
-        for wordCoreData in wordsCoreData {
-            if wordCoreData.word == word {
-                cell.maskTextView.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1)
-                isContains.toggle()
-                break
-            }
+        if containerIKnow.isEmpty {
+        let containerLearn = learnTheseWords.filter { $0.word == word }
+        cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
         }
-        
-        if !isContains {
-            cell.maskTextView.backgroundColor = #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
-        }
-        
         
 //        cell.backgroundColor = .systemGray
         return cell
@@ -269,16 +262,12 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         let locationCollectionView = sender.location(in: collectionView)
 
         guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
-        indexPathForSelectedItem = indexPath
+        indexPathItem = indexPath
         let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         
-        detailViewWord.isHidden.toggle()
-        translateWord.isHidden.toggle()
-        originalWord.isHidden.toggle()
-        learnButton.isHidden.toggle()
-        iKnowButton.isHidden.toggle()
+        hiddenDetailViewWord(value: false)
 
-        setPositionDetailViewWord(locationCollectionView, locationView)
+        detailViewWord.frame.origin = setPositionDetailViewWord(locationCollectionView, locationView)
         detailViewWord.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
         
         UIView.animate(withDuration: 0.2) { self.detailViewWord.transform = .identity }
@@ -289,55 +278,79 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     
     @objc private func iKnowButtonTap() {
-        guard let indexPath = indexPathForSelectedItem else { return }
+        guard let indexPath = indexPathItem else { return }
         
         let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         var isContains = false
         
-        for wordIKnow in wordsCoreData {
+        for wordIKnow in iKnowTheseWords {
             if wordIKnow.word == word {
                 StorageManager.shared.delete(wordIKnow)
-                let indexFind = wordsCoreData.firstIndex(of: wordIKnow)
-                wordsCoreData.remove(at: indexFind ?? 0)
+                let indexFind = iKnowTheseWords.firstIndex(of: wordIKnow)
+                iKnowTheseWords.remove(at: indexFind ?? 0)
                 isContains = true
                 break
             }
         }
         
             if !isContains {
-        guard let wordCoreData = StorageManager.shared.save(title: word) else { return }
-        wordsCoreData.append(wordCoreData)
+        guard let wordCoreData = StorageManager.shared.appendIKnowWord(title: word) else { return }
+        iKnowTheseWords.append(wordCoreData)
         }
     
         collectionView.reloadData()
-        
-        detailViewWord.isHidden.toggle()
-        translateWord.isHidden.toggle()
-        originalWord.isHidden.toggle()
-        learnButton.isHidden.toggle()
-        iKnowButton.isHidden.toggle()
+        hiddenDetailViewWord(value: true)
     }
     
     @objc private func learnButtonTap() {
+        guard let indexPath = indexPathItem else { return }
         
+        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        let containerLearn = learnTheseWords.filter { $0.word == word }
+        
+        if !containerLearn.isEmpty {
+            StorageManager.shared.delete(containerLearn.first!)
+            let indexFind = learnTheseWords.firstIndex(of: containerLearn.first!)
+            learnTheseWords.remove(at: indexFind ?? 0)
+        }
+        
+        if containerLearn.isEmpty {
+            guard let learnWord = StorageManager.shared.appendLearnWord(title: word) else { return }
+            learnTheseWords.append(learnWord)
+        }
+        
+        collectionView.reloadData()
+        hiddenDetailViewWord(value: true)
     }
     
-    private func setPositionDetailViewWord(_ locationCollectionView: CGPoint, _ locationView: CGPoint) {
+    private func hiddenDetailViewWord(value: Bool) {
+        detailViewWord.isHidden = value
+        translateWord.isHidden = value
+        originalWord.isHidden = value
+        learnButton.isHidden = value
+        iKnowButton.isHidden = value
+    }
+    
+    private func setPositionDetailViewWord(_ locationCollectionView: CGPoint, _ locationView: CGPoint) -> CGPoint {
+        
+        var valueX: CGFloat = 0
+        var valueY: CGFloat = 0
         
         switch locationCollectionView.x {
         case ...CGFloat(detailViewWord.frame.width / 2):
-            detailViewWord.frame.origin.x = locationView.x
+            valueX = locationView.x
         case CGFloat(detailViewWord.frame.width / 2) + 1...view.bounds.width - detailViewWord.frame.width / 2:
-            detailViewWord.frame.origin.x = locationView.x - detailViewWord.frame.width / 2
+            valueX = locationView.x - detailViewWord.frame.width / 2
         default:
-            detailViewWord.frame.origin.x = locationView.x - detailViewWord.frame.width
+            valueX = locationView.x - detailViewWord.frame.width
         }
         
         switch locationCollectionView.y {
-        case ...detailViewWord.frame.height:  detailViewWord.frame.origin.y = locationView.y + 20
-        default:
-            detailViewWord.frame.origin.y = locationView.y - detailViewWord.bounds.height - 20
+        case ...detailViewWord.frame.height:  valueY = locationView.y + 20
+        default: valueY = locationView.y - detailViewWord.bounds.height - 20
         }
+        
+        return CGPoint(x: valueX, y: valueY)
     }
     
 }
@@ -406,11 +419,12 @@ extension PageViewController {
         NSLayoutConstraint.activate([
             translateWord.topAnchor.constraint(equalTo: originalWord.bottomAnchor, constant: 20),
             translateWord.centerXAnchor.constraint(equalTo: detailViewWord.centerXAnchor),
-            translateWord.heightAnchor.constraint(equalToConstant: detailViewWord.frame.height / 6)
+            translateWord.heightAnchor.constraint(equalToConstant: detailViewWord.frame.height / 4),
+            translateWord.widthAnchor.constraint(equalToConstant: detailViewWord.frame.width)
         ])
         
         NSLayoutConstraint.activate([
-            iKnowButton.topAnchor.constraint(equalTo: translateWord.bottomAnchor, constant: 25),
+            iKnowButton.heightAnchor.constraint(equalToConstant:  detailViewWord.frame.height / 4),
             iKnowButton.leadingAnchor.constraint(equalTo: detailViewWord.leadingAnchor),
             iKnowButton.widthAnchor.constraint(equalToConstant: detailViewWord.frame.width / 2),
             iKnowButton.bottomAnchor.constraint(equalTo: detailViewWord.bottomAnchor)

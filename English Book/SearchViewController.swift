@@ -148,7 +148,6 @@ class SearchViewController: UIViewController {
     private func setConstrains() {
         
         NSLayoutConstraint.activate([
-//            pageCountLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60),
             pageCountLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0)),
             pageCountLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])

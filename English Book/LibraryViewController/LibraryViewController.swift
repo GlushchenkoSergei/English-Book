@@ -123,7 +123,6 @@ extension LibraryViewController {
         
         NSLayoutConstraint.activate([
             collectionMyLibrary.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-//            collectionMyLibrary.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0)),
             collectionMyLibrary.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             collectionMyLibrary.widthAnchor.constraint(equalToConstant: view.frame.width)
         ])
@@ -132,7 +131,6 @@ extension LibraryViewController {
             bottomLabelView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             bottomLabelView.widthAnchor.constraint(equalToConstant: view.bounds.width),
             bottomLabelView.heightAnchor.constraint(equalToConstant: 200)
-            
         ])
         
     }

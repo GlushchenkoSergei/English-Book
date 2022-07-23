@@ -32,7 +32,7 @@ class DictionaryTableViewController: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Dictionary"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CellWord")
-        guard let words = StorageManager.shared.fetchData() else { return }
+        guard let words = StorageManager.shared.fetchWordsIKnow() else { return }
         wordsIKnow = words
     }
 

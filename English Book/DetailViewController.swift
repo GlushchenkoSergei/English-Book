@@ -108,8 +108,6 @@ Author: \(result.authors?.first?.name ?? "")
         setConstrains()
     }
     
-    
-    
     @objc private func openPageVCButtonAction() {
         progressMask.isHidden = false
         openPageVCButton.backgroundColor = .white
@@ -117,18 +115,19 @@ Author: \(result.authors?.first?.name ?? "")
         divideTextIntoPages(
             text: mainText,
             progressForMask: { [weak self] progress in
-                self?.progressMask.frame = CGRect(x: self?.openPageVCButton.frame.origin.x ?? 0,
-                                                y: self?.openPageVCButton.frame.origin.y ?? 0,
-                                                width: (self?.openPageVCButton.frame.width ?? 0) * progress / 100,
-                                                height: 50)
-                self?.openPageVCButton.setTitle("\(Int(progress)) % completed", for: .normal)
-            },
+                self?.progressMask.frame = CGRect(
+                    x: self?.openPageVCButton.frame.origin.x ?? 0,
+                    y: self?.openPageVCButton.frame.origin.y ?? 0,
+                    width: (self?.openPageVCButton.frame.width ?? 0) * progress / 100,
+                    height: 50
+                )
+                self?.openPageVCButton.setTitle("\(Int(progress)) % completed", for: .normal)},
             completion: { [weak self] pagesOfBook in
                 self?.pagesOfBook = pagesOfBook
                 
                 StorageManager.shared.saveBook(title: self?.result.title ?? "",
-                                            image: self?.result.formats.imageJPEG ?? "",
-                                            pages: self?.pagesOfBook ?? [])
+                                               image: self?.result.formats.imageJPEG ?? "",
+                                               pages: self?.pagesOfBook ?? [])
                 
                 let pageVC = PageViewController()
                 pageVC.pagesOfBook = self?.pagesOfBook ?? []
@@ -165,7 +164,7 @@ Author: \(result.authors?.first?.name ?? "")
         DispatchQueue.global().async {
             var pagesOfBook: [String] = []
             
-            let diverseCount = Int(text.count / 450)
+            let diverseCount = Int(text.count / 400)
             var location = 0
             
             let valueOnePercent = CGFloat(100)/CGFloat(diverseCount)
@@ -174,10 +173,10 @@ Author: \(result.authors?.first?.name ?? "")
             for _ in 0..<diverseCount - 1 {
                 
                 pagesOfBook.append(String(
-                    text[text.index(text.startIndex, offsetBy: location)..<text.index(text.startIndex, offsetBy: location + 450)]
+                    text[text.index(text.startIndex, offsetBy: location)..<text.index(text.startIndex, offsetBy: location + 400)]
                 ))
                 
-                location += 450
+                location += 400
                 counter += 1
                 
                 DispatchQueue.main.async {
@@ -191,21 +190,16 @@ Author: \(result.authors?.first?.name ?? "")
         }
     }
     
-    
     private func checkZip(string: String?) -> Bool {
         guard let stringURL = result.formats.textPlainCharsetUtf8 else { return false}
         print(stringURL)
-        if stringURL.contains(".txt") {
-            return true
-        } else {
-            return false
-        }
+        return stringURL.contains(".txt") ? true : false
     }
     
     private func setImage() {
         guard let url = result.formats.imageJPEG else { return }
         NetworkManage.shared.fetchResponseFrom(url: url) { response in
-            if let data = response.data{
+            if let data = response.data {
                 self.imageBook.image = UIImage(data: data)
             }
         }
@@ -242,27 +236,3 @@ Author: \(result.authors?.first?.name ?? "")
     }
     
 }
-
-//extension DetailViewController: URLSessionDownloadDelegate {
-//
-//    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-//
-//        print("Локация\(location)")
-//        guard let url = downloadTask.originalRequest?.url else { return }
-////        print(url)
-//        print("ЮРЛ\(url)")
-//        let docsPath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-//        let destinationPath = docsPath.appendingPathComponent(url.lastPathComponent)
-//
-////        try? FileManager.default.removeItem(at: destinationPath)
-//
-//        do {
-//            try FileManager.default.copyItem(at: location, to: destinationPath)
-//            fileURL = destinationPath
-//        } catch let error{
-//            print(error.localizedDescription)
-//        }
-//
-//    }
-//
-//}
