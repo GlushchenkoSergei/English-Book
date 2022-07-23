@@ -18,6 +18,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let nextPageButton: UIButton = {
         let button = UIButton()
+        button.tintColor = .systemGray2
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.right"), for: .normal)
         return button
@@ -33,6 +34,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let backPageButton: UIButton = {
         let button = UIButton()
+        button.tintColor = .systemGray2
         button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.backward"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -70,7 +72,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let iKnowButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1)
+        button.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 0.4650824338)
         button.setTitle("i know", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
         button.layer.borderWidth = 1
@@ -81,7 +83,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let learnButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963)
+        button.backgroundColor = #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.4541427915)
         button.setTitle("learn", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
         button.layer.borderWidth = 1

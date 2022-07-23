@@ -81,6 +81,10 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
                 cell.configure(with: response.data, title: self.books[indexPath.row - 1].title ?? "")
             }
         }
+//        cell.layer.shadowPath?.boundingBox = CGRect(x: 3, y: 3, width: 3, height: 3)
+//        cell.layer.borderWidth = 1
+//        cell.layer.shadowRadius = 2
+//        cell.layer.shadowColor = UIColor.red.cgColor
         //        cell.backgroundColor = .red
         return cell
         

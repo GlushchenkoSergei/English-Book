@@ -13,7 +13,7 @@ class CollectionMyLibraryCell: UICollectionViewCell {
     
     let imageViewBook: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleToFill
         return imageView
     }()
     
@@ -39,6 +39,10 @@ class CollectionMyLibraryCell: UICollectionViewCell {
         super.layoutSubviews()
         imageViewBook.frame = CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height - 20)
         nameBookLabel.frame = CGRect(x: 0, y: imageViewBook.frame.height + 10, width: contentView.frame.width, height: 20)
+        self.layer.cornerRadius = 5
+        self.layer.shadowRadius = 9
+        self.layer.shadowOpacity = 0.6
+        self.layer.shadowOffset = CGSize(width: 5, height: 8)
     }
     
     func configure(with dataImage: Data?, title: String) {

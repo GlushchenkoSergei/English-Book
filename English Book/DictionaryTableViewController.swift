@@ -23,8 +23,7 @@ class DictionaryTableViewController: UITableViewController {
             return button
         }()
         
-    var wordsIKnow: [WordIKnow] = []
-    let wordsRepeat: [String] = []
+    var learnTheseWords: [LearnWord] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,8 +31,8 @@ class DictionaryTableViewController: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Dictionary"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CellWord")
-        guard let words = StorageManager.shared.fetchWordsIKnow() else { return }
-        wordsIKnow = words
+        guard let words = StorageManager.shared.fetchLearnWords() else { return }
+        learnTheseWords = words
     }
 
     // MARK: - Table view data source
@@ -42,14 +41,14 @@ class DictionaryTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        wordsIKnow.count
+        learnTheseWords.count
     }
     
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CellWord", for: indexPath)
         var content = cell.defaultContentConfiguration()
-        content.text = wordsIKnow[indexPath.row].word ?? ""
+        content.text = learnTheseWords[indexPath.row].word ?? ""
         cell.contentConfiguration = content
         return cell
     }

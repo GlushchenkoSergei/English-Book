@@ -11,6 +11,7 @@ class SearchViewController: UIViewController {
     
     let backButton: UIButton = {
         let button = UIButton()
+        button.tintColor = .systemGray2
         button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.backward"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -18,6 +19,7 @@ class SearchViewController: UIViewController {
     
     let nextButton: UIButton = {
         let button = UIButton()
+        button.tintColor = .systemGray2
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.right"), for: .normal)
         return button
@@ -27,7 +29,7 @@ class SearchViewController: UIViewController {
         let label = UILabel()
         label.text = "Page 1"
         label.font = UIFont.boldSystemFont(ofSize: 20)
-        label.textColor = .blue
+        label.textColor = .systemGray2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

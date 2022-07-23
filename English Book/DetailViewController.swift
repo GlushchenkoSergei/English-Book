@@ -15,8 +15,12 @@ class DetailViewController: UIViewController {
     private let imageBook: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
+//        imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 5
+        imageView.layer.shadowRadius = 9
+        imageView.layer.shadowOpacity = 0.9
+        imageView.layer.shadowOffset = CGSize(width: 5, height: 8)
         return imageView
     }()
     
@@ -38,6 +42,9 @@ class DetailViewController: UIViewController {
         button.layer.borderWidth = 1
         button.setTitleColor(UIColor.black, for: .normal)
         button.layer.cornerRadius = 12
+        button.layer.shadowRadius = 9
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowOffset = CGSize(width: 5, height: 8)
         return button
     }()
     
@@ -50,6 +57,9 @@ class DetailViewController: UIViewController {
         button.layer.borderWidth = 1
         button.isHidden = true
         button.layer.cornerRadius = 12
+        button.layer.shadowRadius = 9
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowOffset = CGSize(width: 5, height: 8)
         return button
     }()
     
