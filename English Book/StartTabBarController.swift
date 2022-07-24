@@ -13,17 +13,14 @@ class StartTabBarController: UITabBarController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
-//        let libraryVC =  LibraryViewController()
         let libraryVC = UINavigationController(rootViewController: LibraryViewController())
-        libraryVC.title = "Library"
+        libraryVC.title = "Библиотека"
         
-//        let dictionaryVC = DictionaryTableViewController()
         let dictionaryVC = UINavigationController(rootViewController: DictionaryTableViewController())
-        dictionaryVC.title = "Dictionary"
+        dictionaryVC.title = "Словарь"
         
         let testVC = TestViewController()
-//        let testVC = UINavigationController(rootViewController: TestViewController())
-        testVC.title = "Test"
+        testVC.title = "Тест"
         
         setViewControllers([libraryVC, dictionaryVC, testVC], animated: true)
         

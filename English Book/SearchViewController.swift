@@ -47,8 +47,8 @@ class SearchViewController: UIViewController {
     
     var search = Search(count: 0, next: nil, previous: nil, results: nil) {
         didSet {
-            pageCountLabel.text = "Page " + getNumberOfPage(string: search.next)
-            title = "Found \(String(search.count)) books"
+            pageCountLabel.text = "Страница " + getNumberOfPage(string: search.next)
+            title = "Найденно \(String(search.count)) книг"
             tableView.reloadData()
         }
     }
@@ -201,7 +201,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.contentConfiguration = content
             }
         }
-        
+        content.image = UIImage(named: "book")
         cell.contentConfiguration = content
         return cell
     }

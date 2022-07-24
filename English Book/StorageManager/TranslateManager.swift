@@ -13,9 +13,7 @@ class TranslateManager {
         guard let filePath = Bundle.main.path(forResource: "listWords", ofType: "txt") else { return nil}
         guard let data = FileManager.default.contents(atPath: filePath) else { return nil}
         let decodedObject = try? PropertyListDecoder().decode([String: String].self, from: data)
-        return(decodedObject?[word] ?? "нет данных")
+        return(decodedObject?[word] ?? "-")
     }
-    
-    
     
 }

@@ -86,12 +86,8 @@ class StorageManager {
         book.title = title
         book.image = image
         book.body = body
-        
-//        print(pagesNS.first?.page!)
         saveContext()
-        
     }
-    
     
     func delete(_ word: WordIKnow) {
         context.delete(word)

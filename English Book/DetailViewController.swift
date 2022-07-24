@@ -36,7 +36,7 @@ class DetailViewController: UIViewController {
     private let downloadButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Download", for: .normal)
+        button.setTitle("Скачать", for: .normal)
         button.backgroundColor = .systemGray2
         button.isEnabled = false
         button.layer.borderWidth = 1
@@ -101,9 +101,9 @@ class DetailViewController: UIViewController {
         labelBook.text = """
 \(result.title)\n
 Id - [\(result.id)]
-languages -\(result.languages) \n
-Author: \(result.authors?.first?.name ?? "")
-   Birth date: \(result.authors?.first?.birth_year ?? 0)
+Язык -\(result.languages) \n
+Автор: \(result.authors?.first?.name ?? "")
+   Дата рождения: \(result.authors?.first?.birth_year ?? 0)
    Death date: \(result.authors?.first?.death_year ?? 0)
 """
         view.addSubview(imageBook)
@@ -131,7 +131,7 @@ Author: \(result.authors?.first?.name ?? "")
                     width: (self?.openPageVCButton.frame.width ?? 0) * progress / 100,
                     height: 50
                 )
-                self?.openPageVCButton.setTitle("\(Int(progress)) % completed", for: .normal)},
+                self?.openPageVCButton.setTitle("\(Int(progress)) % завершенно", for: .normal)},
             
             completion: { [weak self] pagesOfBook in
                 self?.pagesOfBook = pagesOfBook
@@ -147,7 +147,7 @@ Author: \(result.authors?.first?.name ?? "")
     @objc private func downloadButtonAction() {
         progressMask.isHidden = false
         downloadButton.backgroundColor = .white
-        downloadButton.setTitle("0 % completed", for: .normal)
+        downloadButton.setTitle("0 % завершенно", for: .normal)
         
         guard let url = result.formats.textPlainCharsetUtf8 else { return }
         NetworkManage.shared.fetchDataFrom(url: url) { progress in

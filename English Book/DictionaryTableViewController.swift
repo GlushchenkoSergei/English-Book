@@ -9,41 +9,28 @@ import UIKit
 
 class DictionaryTableViewController: UITableViewController {
     
-    private let learnButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Learn words", for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-
-        private let repeatButton: UIButton = {
-            let button = UIButton()
-            button.setTitle("Repeat", for: .normal)
-            button.translatesAutoresizingMaskIntoConstraints = false
-            return button
-        }()
-        
     var learnTheseWords: [LearnWord] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.prefersLargeTitles = true
-        title = "Dictionary"
+        navigationItem.setRightBarButtonItems([editButtonItem], animated: true)
+        title = "Словарь"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CellWord")
-        guard let words = StorageManager.shared.fetchLearnWords() else { return }
-        learnTheseWords = words
+        learnTheseWords = StorageManager.shared.fetchLearnWords() ?? []
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        learnTheseWords = StorageManager.shared.fetchLearnWords() ?? []
+        tableView.reloadData()
     }
 
     // MARK: - Table view data source
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        1
-    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         learnTheseWords.count
     }
-    
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CellWord", for: indexPath)
@@ -52,6 +39,18 @@ class DictionaryTableViewController: UITableViewController {
         cell.contentConfiguration = content
         return cell
     }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
   
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let wordCD = learnTheseWords[indexPath.row]
+        let _ = StorageManager.shared.appendIKnowWord(title: wordCD.word ?? "")
+        
+        StorageManager.shared.delete(wordCD)
+        learnTheseWords.remove(at: indexPath.row)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
+    }
 
 }

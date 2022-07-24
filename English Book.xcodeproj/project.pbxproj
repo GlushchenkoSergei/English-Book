@@ -11,7 +11,6 @@
 		047441EB288B0FE40098414B /* TranslateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047441EA288B0FE40098414B /* TranslateManager.swift */; };
 		0477C3522882BD9E0013C5A3 /* LibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */; };
 		0477C3542882C51E0013C5A3 /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3532882C51E0013C5A3 /* Point.swift */; };
-		0477C3582882C6880013C5A3 /* Extension + UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3572882C6880013C5A3 /* Extension + UIView.swift */; };
 		0482F0AC28815A0900EB5F62 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 0482F0AB28815A0900EB5F62 /* .gitignore */; };
 		0482F0AE28815A8700EB5F62 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0482F0AD28815A8700EB5F62 /* SearchViewController.swift */; };
 		0482F0B028815E2300EB5F62 /* NetworkManage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0482F0AF28815E2300EB5F62 /* NetworkManage.swift */; };
@@ -39,7 +38,6 @@
 		047441EA288B0FE40098414B /* TranslateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateManager.swift; sourceTree = "<group>"; };
 		0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewController.swift; sourceTree = "<group>"; };
 		0477C3532882C51E0013C5A3 /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
-		0477C3572882C6880013C5A3 /* Extension + UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension + UIView.swift"; sourceTree = "<group>"; };
 		0482F0AB28815A0900EB5F62 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		0482F0AD28815A8700EB5F62 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		0482F0AF28815E2300EB5F62 /* NetworkManage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManage.swift; sourceTree = "<group>"; };
@@ -85,14 +83,6 @@
 				04ADFA1A288C1CBF003AB6AA /* TextSeparationAssistant.swift */,
 			);
 			path = Helpers;
-			sourceTree = "<group>";
-		};
-		0477C3562882C6660013C5A3 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				0477C3572882C6880013C5A3 /* Extension + UIView.swift */,
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		0482F0B128815EF500EB5F62 /* Model */ = {
@@ -148,7 +138,6 @@
 			children = (
 				0482F0B228815F0400EB5F62 /* Sistem */,
 				0482F0B128815EF500EB5F62 /* Model */,
-				0477C3562882C6660013C5A3 /* Extensions */,
 				0477C3552882C5DB0013C5A3 /* Helpers */,
 				049F0CB828896E4A0061538C /* StartTabBarController.swift */,
 				049F0CB5288943170061538C /* LibraryViewController */,
@@ -325,7 +314,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0477C3582882C6880013C5A3 /* Extension + UIView.swift in Sources */,
 				04A8B4DD287D90060012A9E1 /* WordCollectionViewCell.swift in Sources */,
 				049F0CB928896E4A0061538C /* StartTabBarController.swift in Sources */,
 				049F0CBB28896F5E0061538C /* DictionaryTableViewController.swift in Sources */,

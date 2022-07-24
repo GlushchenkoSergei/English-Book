@@ -73,7 +73,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     private let iKnowButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 0.4650824338)
-        button.setTitle("i know", for: .normal)
+        button.setTitle("Знаю", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
         button.layer.borderWidth = 1
         button.isHidden = true
@@ -84,7 +84,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     private let learnButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.4541427915)
-        button.setTitle("learn", for: .normal)
+        button.setTitle("Учить", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
         button.layer.borderWidth = 1
         button.isHidden = true
@@ -125,21 +125,14 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
-        
-        guard let wordsIKnowCD = StorageManager.shared.fetchWordsIKnow() else { return }
-        iKnowTheseWords = wordsIKnowCD
-        
-        guard let wordsLearnCD = StorageManager.shared.fetchLearnWords() else { return }
-        learnTheseWords = wordsLearnCD
-        
         title = nameBook
         view.backgroundColor = .systemBackground
-        let testGesture = UITapGestureRecognizer(target: self, action: #selector(testTapGesture(sender: )))
+        let testGesture = UITapGestureRecognizer(target: self, action: #selector(tapGestureCollectionView(sender: )))
         collectionView.addGestureRecognizer(testGesture)
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        allPagesLabel.text = "\(pagesOfBook.count) pages"
+        allPagesLabel.text = "\(pagesOfBook.count) страниц."
         
         view.addSubview(collectionView)
         view.addSubview(nextPageButton)
@@ -163,6 +156,13 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
         iKnowButton.addTarget(self, action: #selector(iKnowButtonTap), for: .touchUpInside)
         learnButton.addTarget(self, action: #selector(learnButtonTap), for: .touchUpInside)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        iKnowTheseWords = StorageManager.shared.fetchWordsIKnow() ?? []
+        learnTheseWords = StorageManager.shared.fetchLearnWords() ?? []
+        collectionView.reloadData()
     }
     
     @objc private func nextPageButtonTap() {
@@ -253,8 +253,8 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         return size
     }
     
-    // MARK: - Modifide testTapGesture of CollectionView
-    @objc private func testTapGesture(sender: UILongPressGestureRecognizer) {
+    // MARK: - Modified testTapGesture of CollectionView
+    @objc private func tapGestureCollectionView(sender: UILongPressGestureRecognizer) {
         
         let locationView = sender.location(in: view)
         let locationCollectionView = sender.location(in: collectionView)
