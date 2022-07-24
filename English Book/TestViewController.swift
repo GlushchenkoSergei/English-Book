@@ -153,7 +153,7 @@ English book предлагает пройти тест,
     
     // MARK: - Swipe view card trailing
     private func swipeViewCardTrailing() {
-        animateResultView(imageName: "multiply", color: .red)
+//        animateResultView(imageName: "multiply", color: .red)
         
         let _ = StorageManager.shared.appendLearnWord(title: self.wordEn)
         
@@ -178,11 +178,17 @@ English book предлагает пройти тест,
     
     // MARK: - Swipe view card leading
     @objc private func swipeViewCardLeading() {
-        animateResultView(imageName: "chevron.down.circle", color: .green)
+//        animateResultView(imageName: "chevron.down.circle", color: .green)
+        resultImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        resultImageView.image = UIImage(systemName: "chevron.down.circle")
+        resultImageView.tintColor = .green
+        resultImageView.isHidden = false
         
         UIView.animate(withDuration: 0.2,
                       animations: {
             self.viewCard.frame.origin = CGPoint(x: -370, y: self.viewCard.frame.origin.y)
+            self.resultImageView.transform = .identity
+
         },
                       completion: { _ in
             self.labelWord.text = self.iKnowWords.randomElement()?.word
@@ -197,23 +203,30 @@ English book предлагает пройти тест,
         viewCard.center.x = view.center.x
         viewCard.frame.origin = CGPoint(x: 370, y: viewCard.frame.origin.y)
         viewCard.isHidden = false
-        UIView.animate(withDuration: 0.2) {
+        UIImageView.animate(withDuration: 0.2) {
             self.viewCard.frame.origin = CGPoint(x: self.view.center.x - self.viewCard.frame.width / 2,
                                                  y: self.viewCard.frame.origin.y)
+            self.resultImageView.alpha = 0
+            
+        } completion: { _ in
+            self.resultImageView.isHidden = true
+            self.resultImageView.alpha = 1
         }
-    }
+
     
-
-
+    }
     
     private func animateResultView(imageName: String, color: UIColor) {
         resultImageView.image = UIImage(systemName: imageName)
         resultImageView.tintColor = color
         resultImageView.isHidden = false
         
-        self.resultImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+//        self.resultImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        self.resultImageView.frame.size = CGSize(width: 230, height: 230)
+
         UIView.animate(withDuration: 0.1) {
-            self.resultImageView.transform = .identity
+//            self.resultImageView.transform = .identity
+            self.resultImageView.frame.size = CGSize(width: 200, height: 200)
         } completion: { _ in
             UIView.animate(withDuration: 0.2) {
                 self.resultImageView.alpha = 0
