@@ -26,6 +26,7 @@ class TestViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         imageView.isHidden = true
+        imageView.image = UIImage(systemName: "chevron.down.circle")
         imageView.layer.cornerRadius = 15
         imageView.layer.shadowRadius = 15
         imageView.layer.shadowOpacity = 0.5
@@ -73,9 +74,13 @@ English book предлагает пройти тест,
     private var wordRu = ""
     private var wordEn = "" {
         didSet {
-            wordRu = TranslateManager.translate(word: wordEn) ?? ""
+            DispatchQueue.global().async {
+                self.wordRu = TranslateManager.translate(word: self.wordEn) ?? ""
+            }
         }
     }
+    let gestureForSwipe = UIPanGestureRecognizer(target: TestViewController.self, action: #selector(gestureForSwipeAction))
+//    let gestureForViewCard = UITapGestureRecognizer(target: TestViewController.self, action: #selector(flipViewCard(sender: )))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,6 +97,8 @@ English book предлагает пройти тест,
         
         let gestureForSwipe = UIPanGestureRecognizer(target: self, action: #selector(gestureForSwipeAction))
         viewCard.addGestureRecognizer(gestureForSwipe)
+        
+//        gestureForViewCard.is
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,6 +138,7 @@ English book предлагает пройти тест,
        }
     
     @objc private func gestureForSwipeAction(sender: UIPanGestureRecognizer) {
+        guard wordEn != "" else { return }
         guard let fileView = sender.view else { return }
         let translation = sender.translation(in: view)
         
@@ -153,9 +161,25 @@ English book предлагает пройти тест,
     
     // MARK: - Swipe view card trailing
     private func swipeViewCardTrailing() {
-//        animateResultView(imageName: "multiply", color: .red)
+        gestureForSwipe.isEnabled = false
         
-        let _ = StorageManager.shared.appendLearnWord(title: self.wordEn)
+        animateResultView(imageName: "multiply", color: .red)
+        
+        animateSwipe(start: 570,
+                    completionAfterHide: {
+            self.deleteWordFromIKnow()
+        },
+                    completion: {
+            self.myProgress.text = "Вы выучили \( self.iKnowWords.count) сл."
+            let _ = StorageManager.shared.appendLearnWord(title: self.wordEn)
+            self.wordEn = self.labelWord.text ?? ""
+            self.gestureForSwipe.isEnabled = true
+        })
+        
+        
+    }
+   
+    private func deleteWordFromIKnow() {
         
         for iKnowWord in iKnowWords {
             if iKnowWord.word == wordEn {
@@ -166,67 +190,46 @@ English book предлагает пройти тест,
             }
         }
         
-        UIView.animate(withDuration: 0.2) {
-            self.viewCard.frame.origin = CGPoint(x: 570, y: self.viewCard.frame.origin.y)
-        } completion: { _ in
-            self.labelWord.text = self.iKnowWords.randomElement()?.word
-            self.wordEn = self.labelWord.text ?? ""
-            self.myProgress.text = "Вы выучили \(self.iKnowWords.count) сл."
-            self.setPositionViewWithAnimate()
-        }
     }
-    
+
     // MARK: - Swipe view card leading
     @objc private func swipeViewCardLeading() {
-//        animateResultView(imageName: "chevron.down.circle", color: .green)
-        resultImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        resultImageView.image = UIImage(systemName: "chevron.down.circle")
-        resultImageView.tintColor = .green
-        resultImageView.isHidden = false
-        
-        UIView.animate(withDuration: 0.2,
-                      animations: {
-            self.viewCard.frame.origin = CGPoint(x: -370, y: self.viewCard.frame.origin.y)
-            self.resultImageView.transform = .identity
-
-        },
-                      completion: { _ in
-            self.labelWord.text = self.iKnowWords.randomElement()?.word
-            self.wordEn = self.labelWord.text ?? ""
-            
-            self.setPositionViewWithAnimate()
+        animateResultView(imageName: "chevron.down.circle", color: .green)
+        animateSwipe(start: -370, completionAfterHide: {}, completion: { [self] in
+            wordEn =  labelWord.text ?? ""
         })
     }
     
-    private func setPositionViewWithAnimate() {
-        viewCard.isHidden = true
-        viewCard.center.x = view.center.x
-        viewCard.frame.origin = CGPoint(x: 370, y: viewCard.frame.origin.y)
-        viewCard.isHidden = false
-        UIImageView.animate(withDuration: 0.2) {
-            self.viewCard.frame.origin = CGPoint(x: self.view.center.x - self.viewCard.frame.width / 2,
-                                                 y: self.viewCard.frame.origin.y)
-            self.resultImageView.alpha = 0
+    private func animateSwipe(start position: CGFloat, completionAfterHide: @escaping () -> (Void), completion: @escaping () -> (Void)) {
+        
+        UIView.animate(withDuration: 0.2,
+                       animations: {
+            self.viewCard.frame.origin = CGPoint(x: position, y: self.viewCard.frame.origin.y)
+        },
+                       completion: { _ in
+            completionAfterHide()
+            self.labelWord.text = self.iKnowWords.randomElement()?.word
+            self.viewCard.frame.origin = CGPoint(x: 370, y: self.viewCard.frame.origin.y)
             
-        } completion: { _ in
-            self.resultImageView.isHidden = true
-            self.resultImageView.alpha = 1
-        }
-
-    
+            UIImageView.animate(withDuration: 0.2) {
+            self.viewCard.frame.origin = CGPoint(x: self.view.center.x - self.viewCard.frame.width / 2,
+                                                  y: self.viewCard.frame.origin.y)
+                completion()
+            }
+        })
+        
     }
     
     private func animateResultView(imageName: String, color: UIColor) {
-        resultImageView.image = UIImage(systemName: imageName)
-        resultImageView.tintColor = color
+//        private func animateResultView() {
+//        resultImageView.image = UIImage(systemName: imageName)
+//        resultImageView.tintColor = color
         resultImageView.isHidden = false
         
-//        self.resultImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        self.resultImageView.frame.size = CGSize(width: 230, height: 230)
+        self.resultImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
 
-        UIView.animate(withDuration: 0.1) {
-//            self.resultImageView.transform = .identity
-            self.resultImageView.frame.size = CGSize(width: 200, height: 200)
+        UIView.animate(withDuration: 0.2) {
+            self.resultImageView.transform = .identity
         } completion: { _ in
             UIView.animate(withDuration: 0.2) {
                 self.resultImageView.alpha = 0
