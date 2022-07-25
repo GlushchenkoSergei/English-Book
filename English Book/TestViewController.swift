@@ -21,12 +21,25 @@ class TestViewController: UIViewController {
         return view
     }()
     
-    private let resultImageView: UIImageView = {
+    private let resultImageLeading: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         imageView.isHidden = true
         imageView.image = UIImage(systemName: "chevron.down.circle")
+        imageView.layer.cornerRadius = 15
+        imageView.layer.shadowRadius = 15
+        imageView.layer.shadowOpacity = 0.5
+        imageView.layer.shadowOffset = CGSize(width: 0, height: 8)
+        return imageView
+    }()
+    
+    private let resultImageTrailing: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        imageView.isHidden = true
+        imageView.image = UIImage(systemName: "multiply")
         imageView.layer.cornerRadius = 15
         imageView.layer.shadowRadius = 15
         imageView.layer.shadowOpacity = 0.5
@@ -74,13 +87,9 @@ English book предлагает пройти тест,
     private var wordRu = ""
     private var wordEn = "" {
         didSet {
-            DispatchQueue.global().async {
                 self.wordRu = TranslateManager.translate(word: self.wordEn) ?? ""
-            }
         }
     }
-    let gestureForSwipe = UIPanGestureRecognizer(target: TestViewController.self, action: #selector(gestureForSwipeAction))
-//    let gestureForViewCard = UITapGestureRecognizer(target: TestViewController.self, action: #selector(flipViewCard(sender: )))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,7 +98,8 @@ English book предлагает пройти тест,
         view.addSubview(viewCard)
         view.addSubview(descriptionTest)
         view.addSubview(myProgress)
-        view.addSubview(resultImageView)
+        view.addSubview(resultImageLeading)
+        view.addSubview(resultImageTrailing)
         viewCard.addSubview(labelWord)
         
         let gestureForViewCard = UITapGestureRecognizer(target: self, action: #selector(flipViewCard(sender: )))
@@ -98,7 +108,6 @@ English book предлагает пройти тест,
         let gestureForSwipe = UIPanGestureRecognizer(target: self, action: #selector(gestureForSwipeAction))
         viewCard.addGestureRecognizer(gestureForSwipe)
         
-//        gestureForViewCard.is
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -161,10 +170,9 @@ English book предлагает пройти тест,
     
     // MARK: - Swipe view card trailing
     private func swipeViewCardTrailing() {
-        gestureForSwipe.isEnabled = false
-        
-        animateResultView(imageName: "multiply", color: .red)
-        
+//        "multiply"
+        animateResultView(imageView: resultImageTrailing, color: .red)
+//        animateResultView(color: .red)
         animateSwipe(start: 570,
                     completionAfterHide: {
             self.deleteWordFromIKnow()
@@ -173,7 +181,6 @@ English book предлагает пройти тест,
             self.myProgress.text = "Вы выучили \( self.iKnowWords.count) сл."
             let _ = StorageManager.shared.appendLearnWord(title: self.wordEn)
             self.wordEn = self.labelWord.text ?? ""
-            self.gestureForSwipe.isEnabled = true
         })
         
         
@@ -194,7 +201,7 @@ English book предлагает пройти тест,
 
     // MARK: - Swipe view card leading
     @objc private func swipeViewCardLeading() {
-        animateResultView(imageName: "chevron.down.circle", color: .green)
+        animateResultView(imageView: resultImageLeading, color: .green)
         animateSwipe(start: -370, completionAfterHide: {}, completion: { [self] in
             wordEn =  labelWord.text ?? ""
         })
@@ -220,22 +227,19 @@ English book предлагает пройти тест,
         
     }
     
-    private func animateResultView(imageName: String, color: UIColor) {
-//        private func animateResultView() {
-//        resultImageView.image = UIImage(systemName: imageName)
-//        resultImageView.tintColor = color
-        resultImageView.isHidden = false
-        
-        self.resultImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+    private func animateResultView(imageView: UIImageView, color: UIColor) {
+        imageView.tintColor = color
+        imageView.isHidden = false
+        imageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
 
         UIView.animate(withDuration: 0.2) {
-            self.resultImageView.transform = .identity
+            imageView.transform = .identity
         } completion: { _ in
             UIView.animate(withDuration: 0.2) {
-                self.resultImageView.alpha = 0
+                imageView.alpha = 0
             } completion: { _ in
-                self.resultImageView.isHidden = true
-                self.resultImageView.alpha = 1
+                imageView.isHidden = true
+                imageView.alpha = 1
             }
         }
     }
@@ -271,11 +275,19 @@ extension TestViewController {
         ])
         
         NSLayoutConstraint.activate([
-            resultImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            resultImageView.centerYAnchor.constraint(equalTo: viewCard.centerYAnchor),
-            resultImageView.widthAnchor.constraint(equalToConstant: 200),
-            resultImageView.heightAnchor.constraint(equalToConstant: 200)
+            resultImageLeading.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            resultImageLeading.centerYAnchor.constraint(equalTo: viewCard.centerYAnchor),
+            resultImageLeading.widthAnchor.constraint(equalToConstant: 200),
+            resultImageLeading.heightAnchor.constraint(equalToConstant: 200)
         ])
+        
+        NSLayoutConstraint.activate([
+            resultImageTrailing.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            resultImageTrailing.centerYAnchor.constraint(equalTo: viewCard.centerYAnchor),
+            resultImageTrailing.widthAnchor.constraint(equalToConstant: 200),
+            resultImageTrailing.heightAnchor.constraint(equalToConstant: 200)
+        ])
+        
     }
 }
 

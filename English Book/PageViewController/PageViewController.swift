@@ -45,7 +45,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         view.backgroundColor = .systemGray2
         view.clipsToBounds = true
         view.layer.cornerRadius = 20
-        view.layer.borderWidth = 2
+        view.layer.borderWidth = 1
         view.isHidden = true
         return view
     }()
@@ -75,7 +75,6 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         button.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 0.4650824338)
         button.setTitle("Знаю", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
-        button.layer.borderWidth = 1
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -86,7 +85,6 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         button.backgroundColor = #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.4541427915)
         button.setTitle("Учить", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
-        button.layer.borderWidth = 1
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
