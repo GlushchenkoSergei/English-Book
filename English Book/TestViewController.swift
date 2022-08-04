@@ -81,7 +81,6 @@ English book предлагает пройти тест,
     }()
     
     private var iKnowWords: [WordIKnow] = []
-    
     private var learnTheseWords: [LearnWord] = []
     
     private var wordRu = ""
@@ -107,7 +106,6 @@ English book предлагает пройти тест,
         
         let gestureForSwipe = UIPanGestureRecognizer(target: self, action: #selector(gestureForSwipeAction))
         viewCard.addGestureRecognizer(gestureForSwipe)
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -170,9 +168,7 @@ English book предлагает пройти тест,
     
     // MARK: - Swipe view card trailing
     private func swipeViewCardTrailing() {
-//        "multiply"
         animateResultView(imageView: resultImageTrailing, color: .red)
-//        animateResultView(color: .red)
         animateSwipe(start: 570,
                     completionAfterHide: {
             self.deleteWordFromIKnow()
@@ -207,7 +203,7 @@ English book предлагает пройти тест,
         })
     }
     
-    private func animateSwipe(start position: CGFloat, completionAfterHide: @escaping () -> (Void), completion: @escaping () -> (Void)) {
+    private func animateSwipe(start position: CGFloat, completionAfterHide: @escaping () -> (), completion: @escaping () -> ()) {
         
         UIView.animate(withDuration: 0.2,
                        animations: {
