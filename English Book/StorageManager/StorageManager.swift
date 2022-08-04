@@ -104,8 +104,6 @@ class StorageManager {
         saveContext()
     }
     
-    
-    // MARK: - Core Data Saving support
     func saveContext() {
         if context.hasChanges {
             do {
@@ -116,4 +114,17 @@ class StorageManager {
             
         }
     }
+    
+    // MARK: - User defaults
+    func getCurrentPageOf(book name: String) -> Int {
+        let userDefaults = UserDefaults.standard
+        let value = userDefaults.integer(forKey: name)
+        return value
+    }
+    
+    func setCurrentPageOf(book name: String, page: Int) {
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(page, forKey: name)
+    }
+    
 }

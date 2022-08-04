@@ -7,12 +7,27 @@
 
 import UIKit
 
+protocol PageViewControllerInputProtocol: AnyObject {
+    func displayTitleBook(with title: String)
+    func getComponentsOfPage(with components: [String])
+    func getArrayWidthCell(sizesForCells: [Double])
+    func displayNumberOfPages(with count: String)
+}
+
+protocol PageViewControllerOutputProtocol: AnyObject {
+    init(view: PageViewControllerInputProtocol)
+    func showPages()
+    func nextButtonPressed()
+    func backButtonPressed()
+}
+
+
 class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-//        collectionView.isScrollEnabled = false
+        //        collectionView.isScrollEnabled = false
         return collectionView
     }()
     
@@ -93,24 +108,9 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     var pagesOfBook: [String] = []
     var nameBook = ""
     
-    // Для подсчета ширины cell
-    private let labelForCountingWidthCell: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.monospacedSystemFont(ofSize: 17, weight: .black)
-        return label
-    }()
-   
-    private var currentPage = 1 {
-        didSet{
-            componentsOfPage = divisionIntoParts(this: pagesOfBook[currentPage - 1])
-            addingSpacerForLine()
-            createArrayWidthCell()
-            collectionView.reloadData()
-        }
-    }
+    var presenter: PageViewControllerOutputProtocol!
+    private let configurator: PageConfiguratorInputProtocol = PageConfigurator()
     
-    private var value = 0
-    private var counterOneLine = 0
     
     private var componentsOfPage: [String] = []
     private var sizesForCells: [Double] = []
@@ -122,15 +122,15 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        configurator.configure(with: self, and: pagesOfBook, nameBook: nameBook)
+        presenter.showPages()
+        
         collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
-        title = nameBook
         view.backgroundColor = .systemBackground
         let testGesture = UITapGestureRecognizer(target: self, action: #selector(tapGestureCollectionView(sender: )))
         collectionView.addGestureRecognizer(testGesture)
         collectionView.delegate = self
         collectionView.dataSource = self
-        
-        allPagesLabel.text = "\(pagesOfBook.count) страниц."
         
         view.addSubview(collectionView)
         view.addSubview(nextPageButton)
@@ -142,13 +142,10 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         detailViewWord.addSubview(originalWord)
         detailViewWord.addSubview(iKnowButton)
         detailViewWord.addSubview(learnButton)
-
+        
         detailViewWord.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: view.bounds.height / 5)
         
         setConstraints()
-        componentsOfPage = divisionIntoParts(this: pagesOfBook[currentPage - 1])
-        addingSpacerForLine()
-        createArrayWidthCell()
         
         nextPageButton.addTarget(self, action: #selector(nextPageButtonTap), for: .touchUpInside)
         backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
@@ -164,47 +161,13 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @objc private func nextPageButtonTap() {
-        if currentPage < pagesOfBook.count { currentPage += 1 }
+        presenter.nextButtonPressed()
+        collectionView.reloadData()
     }
     
     @objc private func backPageButtonTap() {
-        if currentPage != 1 { currentPage -= 1 }
-    }
-    
-    private func createArrayWidthCell() {
-        sizesForCells.removeAll()
-        for component in componentsOfPage {
-            labelForCountingWidthCell.text = component
-            labelForCountingWidthCell.sizeToFit()
-            sizesForCells.append(labelForCountingWidthCell.frame.width)
-        }
-    }
-    
-    private func addingSpacerForLine() {
-        
-        for index in 0...componentsOfPage.count - 1 {
-            
-            value += componentsOfPage[index].count
-            
-            if value > 31 {
-                let x = 31 - counterOneLine
-                guard x > 0 else { return }
-                for _ in 0...x {
-                    componentsOfPage[index - 1] += " "
-                }
-                counterOneLine = 0
-                value = componentsOfPage[index].count
-            }
-            counterOneLine += componentsOfPage[index].count
-        }
-    }
-    
-    private func divisionIntoParts(this text: String) -> [String] {
-        var components: [String] = []
-        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .byWords) { _, _, enclosingRange, _ in
-            components.append(String(text[enclosingRange]))
-        }
-        return components
+        presenter.backButtonPressed()
+        collectionView.reloadData()
     }
     
     private func removePunctuationMarks(this text: String) -> String {
@@ -229,26 +192,20 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as! WordCollectionViewCell
         
         let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
-        cell.configure(with: componentsOfPage[indexPath.row], sizeMask: getSizeMask(text: word))
         
+        cell.configure(with: componentsOfPage[indexPath.row],
+                       sizeMask: CalculationWidthLabel.shared.getSizeMask(word))
         
         let containerIKnow = iKnowTheseWords.filter { $0.word == word }
         cell.maskTextView.backgroundColor = !containerIKnow.isEmpty ? #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
         
         if containerIKnow.isEmpty {
-        let containerLearn = learnTheseWords.filter { $0.word == word }
-        cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
+            let containerLearn = learnTheseWords.filter { $0.word == word }
+            cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
         }
         
-//        cell.backgroundColor = .systemGray
+                cell.backgroundColor = .systemGray
         return cell
-    }
-    
-    func getSizeMask(text: String) -> Double {
-        labelForCountingWidthCell.text = text
-        labelForCountingWidthCell.sizeToFit()
-        let size = labelForCountingWidthCell.frame.width
-        return size
     }
     
     // MARK: - Modified testTapGesture of CollectionView
@@ -256,18 +213,18 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         
         let locationView = sender.location(in: view)
         let locationCollectionView = sender.location(in: collectionView)
-
+        
         guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
         indexPathItem = indexPath
         let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         
         hiddenDetailViewWord(value: false)
-
+        
         detailViewWord.frame.origin = setPositionDetailViewWord(locationCollectionView, locationView)
         detailViewWord.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
         
         UIView.animate(withDuration: 0.2) { self.detailViewWord.transform = .identity }
-
+        
         originalWord.text = word
         translateWord.text = TranslateManager.translate(word: word)
     }
@@ -298,11 +255,11 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
             }
         }
         
-            if !isContains {
-        guard let wordCoreData = StorageManager.shared.appendIKnowWord(title: word) else { return }
-        iKnowTheseWords.append(wordCoreData)
+        if !isContains {
+            guard let wordCoreData = StorageManager.shared.appendIKnowWord(title: word) else { return }
+            iKnowTheseWords.append(wordCoreData)
         }
-    
+        
         collectionView.reloadData()
         hiddenDetailViewWord(value: true)
     }
@@ -368,35 +325,6 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         return CGPoint(x: valueX, y: valueY)
     }
     
-}
-
-  
-// MARK: - UICollectionViewDelegateFlowLayout
-extension PageViewController: UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-    }
-    
-    //расстояние между горизонтальными секциями
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        9
-    }
-    
-    //расстояние между вертикальными разделителями
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        CGSize(width: (sizesForCells[indexPath.row]), height: 30)
-    }
-}
-
-
-// MARK: - Set constraints
-extension PageViewController {
-    
     private func setConstraints() {
         
         NSLayoutConstraint.activate([
@@ -451,7 +379,48 @@ extension PageViewController {
             learnButton.widthAnchor.constraint(equalToConstant: detailViewWord.frame.width / 2),
             learnButton.bottomAnchor.constraint(equalTo: detailViewWord.bottomAnchor)
         ])
-        
+    }
+    
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout
+extension PageViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        9
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        CGSize(width: (sizesForCells[indexPath.row]), height: 30)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        0
+    }
+    
+}
+
+// MARK: - PageViewControllerInputProtocol
+extension PageViewController: PageViewControllerInputProtocol {
+    
+    func displayTitleBook(with title: String) {
+        self.title = title
+    }
+    
+    func displayNumberOfPages(with count: String) {
+        self.allPagesLabel.text = count
+    }
+    
+    func getComponentsOfPage(with components: [String]) {
+        self.componentsOfPage = components
+    }
+    
+    func getArrayWidthCell(sizesForCells: [Double]) {
+        self.sizesForCells = sizesForCells
     }
     
 }
