@@ -10,7 +10,6 @@ import UIKit
 
 class CalculationWidthLabel {
     static let shared = CalculationWidthLabel()
-    private init() {}
     
     // Для подсчета ширины cell
     private let labelForCountingWidthCell: UILabel = {
@@ -19,6 +18,7 @@ class CalculationWidthLabel {
         return label
     }()
     
+    private init() {}
     
     func createArrayWidthCells(_ componentsOfPage: [String]) -> [Double] {
         var sizesForCells: [Double] = []

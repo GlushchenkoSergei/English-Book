@@ -117,14 +117,14 @@ class StorageManager {
     
     // MARK: - User defaults
     func getCurrentPageOf(book name: String) -> Int {
-        let userDefaults = UserDefaults.standard
-        let value = userDefaults.integer(forKey: name)
+//        let userDefaults = UserDefaults.standard
+        let value = UserDefaults.standard.integer(forKey: name)
         return value
     }
     
     func setCurrentPageOf(book name: String, page: Int) {
-        let userDefaults = UserDefaults.standard
-        userDefaults.set(page, forKey: name)
+//        let userDefaults = UserDefaults.standard
+        UserDefaults.standard.set(page, forKey: name)
     }
     
 }

@@ -8,10 +8,8 @@
 import Foundation
 
 struct PageData {
-//    let nameBook: String
     let componentsOfPage: [String]
     let sizesForCells: [Double]
-//    let numberOfPages: Int
 }
 
 class PagePresenter: PageViewControllerOutputProtocol {
@@ -26,6 +24,10 @@ class PagePresenter: PageViewControllerOutputProtocol {
     func showPages() {
         interactor.provideBasicInformation()
         interactor.providePageData()
+    }
+    
+    func getWordsDatabase() {
+        interactor.provideWordsDatabase()
     }
     
     func nextButtonPressed() {
@@ -50,5 +52,9 @@ extension PagePresenter: PageInteractorOutputProtocol {
         view.getArrayWidthCell(sizesForCells: pageData.sizesForCells)
     }
     
+    func receiveWordsDatabase(iKnowTheseWords: [WordIKnow], learnTheseWords: [LearnWord]) {
+        view.displayWordsIKnow(iKnowTheseWords: iKnowTheseWords)
+        view.displayWordsLearn(learnTheseWords: learnTheseWords)
+    }
     
 }

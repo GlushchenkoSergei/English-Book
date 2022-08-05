@@ -12,11 +12,14 @@ protocol PageViewControllerInputProtocol: AnyObject {
     func getComponentsOfPage(with components: [String])
     func getArrayWidthCell(sizesForCells: [Double])
     func displayNumberOfPages(with count: String)
+    func displayWordsIKnow(iKnowTheseWords: [WordIKnow])
+    func displayWordsLearn(learnTheseWords: [LearnWord])
 }
 
 protocol PageViewControllerOutputProtocol: AnyObject {
     init(view: PageViewControllerInputProtocol)
     func showPages()
+    func getWordsDatabase()
     func nextButtonPressed()
     func backButtonPressed()
 }
@@ -27,7 +30,6 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        //        collectionView.isScrollEnabled = false
         return collectionView
     }()
     
@@ -155,8 +157,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        iKnowTheseWords = StorageManager.shared.fetchWordsIKnow() ?? []
-        learnTheseWords = StorageManager.shared.fetchLearnWords() ?? []
+        presenter.getWordsDatabase()
         collectionView.reloadData()
     }
     
@@ -170,15 +171,6 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         collectionView.reloadData()
     }
     
-    private func removePunctuationMarks(this text: String) -> String {
-        var string: String = ""
-        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .byWords) { _, substringRange, _, _ in
-            string = String(text[substringRange])
-        }
-        return string
-    }
-    
-    
 }
 
 // MARK: - UICollectionViewDataSource, UICollectionViewDelegate
@@ -191,10 +183,10 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as! WordCollectionViewCell
         
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         
         cell.configure(with: componentsOfPage[indexPath.row],
-                       sizeMask: CalculationWidthLabel.shared.getSizeMask(word))
+                      sizeMask: CalculationWidthLabel.shared.getSizeMask(word))
         
         let containerIKnow = iKnowTheseWords.filter { $0.word == word }
         cell.maskTextView.backgroundColor = !containerIKnow.isEmpty ? #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
@@ -204,7 +196,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
             cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
         }
         
-                cell.backgroundColor = .systemGray
+        cell.backgroundColor = .systemGray
         return cell
     }
     
@@ -216,7 +208,8 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         
         guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
         indexPathItem = indexPath
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        
+        let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         
         hiddenDetailViewWord(value: false)
         
@@ -233,7 +226,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     @objc private func iKnowButtonTap() {
         guard let indexPath = indexPathItem else { return }
         
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         var isContains = false
         
         for wordLearn in learnTheseWords {
@@ -267,7 +260,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     @objc private func learnButtonTap() {
         guard let indexPath = indexPathItem else { return }
         
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         let containerLearn = learnTheseWords.filter { $0.word == word }
         
         
@@ -421,6 +414,14 @@ extension PageViewController: PageViewControllerInputProtocol {
     
     func getArrayWidthCell(sizesForCells: [Double]) {
         self.sizesForCells = sizesForCells
+    }
+    
+    func displayWordsIKnow(iKnowTheseWords: [WordIKnow]) {
+        self.iKnowTheseWords = iKnowTheseWords
+    }
+    
+    func displayWordsLearn(learnTheseWords: [LearnWord]) {
+        self.learnTheseWords = learnTheseWords
     }
     
 }

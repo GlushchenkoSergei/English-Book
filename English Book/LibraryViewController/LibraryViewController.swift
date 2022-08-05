@@ -97,7 +97,7 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
             let book = books[indexPath.row - 1]
             var pagesOfBook: [String] = []
             
-            TextSeparationAssistant.divideTextIntoPages(
+            TextAssistant.shared.divideTextIntoPages(
                 text: book.body ?? "",
                 progress: { progress in
                     self.progressView.setProgress(Float(progress/100), animated: true)

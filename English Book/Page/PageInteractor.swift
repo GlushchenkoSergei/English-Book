@@ -14,11 +14,13 @@ protocol PageInteractorInputProtocol: AnyObject {
     func providePageData()
     func provideNextPageData()
     func provideBackPageData()
+    func provideWordsDatabase()
 }
 
 protocol PageInteractorOutputProtocol: AnyObject {
     func receiveNameBook(with name: String, countPages: Int)
     func receivePageData(with nameData: PageData)
+    func receiveWordsDatabase(iKnowTheseWords: [WordIKnow], learnTheseWords: [LearnWord])
 }
 
 // MARK: -  Interactor
@@ -44,35 +46,6 @@ class PageInteractor {
         self.pages = pages
     }
     
-    private func divisionIntoParts(this text: String) -> [String] {
-        var components: [String] = []
-        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .byWords) { _, _, enclosingRange, _ in
-            components.append(String(text[enclosingRange]))
-        }
-        return components
-    }
-    
-    private func addingSpacerForLine(_ componentsOfPage: inout [String]) {
-        var value = 0
-        var counterOneLine = 0
-        
-        for index in 0...componentsOfPage.count - 1 {
-            
-            value += componentsOfPage[index].count
-            
-            if value > 31 {
-                let x = 31 - counterOneLine
-                guard x > 0 else { return }
-                for _ in 0...x {
-                    componentsOfPage[index - 1] += " "
-                }
-                counterOneLine = 0
-                value = componentsOfPage[index].count
-            }
-            counterOneLine += componentsOfPage[index].count
-        }
-    }
-    
 }
 
 extension PageInteractor: PageInteractorInputProtocol {
@@ -82,14 +55,21 @@ extension PageInteractor: PageInteractorInputProtocol {
     }
     
     func providePageData() {
-        var componentsOfPage = divisionIntoParts(this: pages[currentPage])
-        addingSpacerForLine(&componentsOfPage)
+        var componentsOfPage = TextAssistant.shared.divisionIntoParts(this: pages[currentPage])
+        TextAssistant.shared.addingSpacerForLine(&componentsOfPage)
         
         let sizesForCells = CalculationWidthLabel.shared.createArrayWidthCells(componentsOfPage)
-    
+        
         let pageData = PageData(componentsOfPage: componentsOfPage, sizesForCells: sizesForCells)
         
         presenter.receivePageData(with: pageData)
+    }
+    
+    func provideWordsDatabase() {
+        let iKnowTheseWords = StorageManager.shared.fetchWordsIKnow() ?? []
+        let learnTheseWords = StorageManager.shared.fetchLearnWords() ?? []
+        
+        presenter.receiveWordsDatabase(iKnowTheseWords: iKnowTheseWords, learnTheseWords: learnTheseWords)
     }
     
     

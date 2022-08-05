@@ -122,7 +122,7 @@ Id - [\(result.id)]
         progressMask.isHidden = false
         openPageVCButton.backgroundColor = .white
         
-        TextSeparationAssistant.divideTextIntoPages(
+        TextAssistant.shared.divideTextIntoPages(
             text: mainText,
             progress: { [weak self] progress in
                 self?.progressMask.frame = CGRect(
