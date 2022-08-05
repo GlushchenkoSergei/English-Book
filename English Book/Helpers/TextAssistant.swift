@@ -58,26 +58,35 @@ class TextAssistant {
         return components
     }
     
-    func addingSpacerForLine(_ componentsOfPage: inout [String]) {
-        var value = 0
-        var counterOneLine = 0
+    func addingSpacerForLine(_ componentsOfPage: inout [String], widthScreen: Double) {
+        print("_______________________________________________________")
+        let widthScreen = widthScreen - 32
+        print("Общая ширина \(widthScreen)")
+        var width: Double = 0
+        var counterWidthOneLine: Double = 0
+        let widthOneSpacer = CalculationWidthLabel.shared.getSizeMask(" ")
+        print("ширина пробела\(widthOneSpacer)")
         
         for index in 0...componentsOfPage.count - 1 {
+
+            width += CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
             
-            value += componentsOfPage[index].count
-            
-            if value > 31 {
-                let x = 31 - counterOneLine
-                guard x > 0 else { return }
-                for _ in 0...x {
+            if width >= widthScreen {
+                let x = (widthScreen - counterWidthOneLine) / widthOneSpacer
+
+                guard Int(x) > 0 else { return }
+
+                
+                for _ in 0...Int(x) - 1 {
                     componentsOfPage[index - 1] += " "
                 }
-                counterOneLine = 0
-                value = componentsOfPage[index].count
+                counterWidthOneLine = 0
+                width = CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
             }
             
-            counterOneLine += componentsOfPage[index].count
+            counterWidthOneLine += CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
         }
+
     }
-    
+            
 }

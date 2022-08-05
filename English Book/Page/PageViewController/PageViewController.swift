@@ -18,7 +18,7 @@ protocol PageViewControllerInputProtocol: AnyObject {
 
 protocol PageViewControllerOutputProtocol: AnyObject {
     init(view: PageViewControllerInputProtocol)
-    func showPages()
+    func showPages(with width: Double)
     func getWordsDatabase()
     func nextButtonPressed()
     func backButtonPressed()
@@ -125,7 +125,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         configurator.configure(with: self, and: pagesOfBook, nameBook: nameBook)
-        presenter.showPages()
+        presenter.showPages(with: view.bounds.width)
+
         
         collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
         view.backgroundColor = .systemBackground
@@ -208,6 +209,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         
         guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
         indexPathItem = indexPath
+        print("Ширина ячейки = \(CalculationWidthLabel.shared.getSizeMask(componentsOfPage[indexPath.row]))")
         
         let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         

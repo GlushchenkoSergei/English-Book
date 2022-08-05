@@ -20,10 +20,11 @@ class PagePresenter: PageViewControllerOutputProtocol {
     required init(view: PageViewControllerInputProtocol) {
         self.view = view
     }
-    
-    func showPages() {
+     
+    func showPages(with width: Double) {
         interactor.provideBasicInformation()
-        interactor.providePageData()
+        interactor.providePageData(with: width)
+//        print("Из presenter \(width - 32)")
     }
     
     func getWordsDatabase() {
