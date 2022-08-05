@@ -203,7 +203,6 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         
         guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
         indexPathItem = indexPath
-        print("Ширина ячейки = \(CalculationWidthLabel.shared.getSizeMask(componentsOfPage[indexPath.row]))")
         
         let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         
