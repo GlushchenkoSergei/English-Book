@@ -82,6 +82,7 @@ class DetailViewController: UIViewController {
     }
     var pagesOfBook: [String] = []
     var finishDiverse = false
+    let dowloadedBooks = StorageManager.shared.fetchDataBook()
     
     var delegateLibrary: LibraryViewControllerDelegate!
     
@@ -91,7 +92,17 @@ class DetailViewController: UIViewController {
         view.backgroundColor = .systemBackground
         title = result.title
         
-        if checkZip(string: result.formats.textPlainCharsetUtf8) {
+        checkDownloaded(result.title) { body, isHave in
+            if !isHave {
+                guard let body = body else { return }
+                mainText = body
+                openPageVCButton.isHidden = false
+                downloadButton.isHidden = true
+            }
+        }
+        
+        
+        if checkTxt(string: result.formats.textPlainCharsetUtf8) {
             downloadButton.isEnabled = true
             downloadButton.backgroundColor = .blue
         } else {
@@ -174,10 +185,21 @@ Id - [\(result.id)]
         }
     }
     
-    private func checkZip(string: String?) -> Bool {
+    private func checkTxt(string: String?) -> Bool {
         guard let stringURL = result.formats.textPlainCharsetUtf8 else { return false}
         print(stringURL)
         return stringURL.contains(".txt") ? true : false
+    }
+    
+    private func checkDownloaded(_ book: String, completion: (String?, Bool) -> ()) {
+        var boolValue = false
+        
+        dowloadedBooks?.forEach { bookCD in
+            if bookCD.title == book {
+                boolValue.toggle()
+                completion(bookCD.body, boolValue)
+            }
+        }
     }
     
     private func setImage() {
