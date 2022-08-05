@@ -57,7 +57,6 @@ extension PageInteractor: PageInteractorInputProtocol {
     }
     
     func providePageData(with width: Double) {
-//        print("Из interactor \(width - 32)")
         widthScreen = width
         var componentsOfPage = TextAssistant.shared.divisionIntoParts(this: pages[currentPage])
         TextAssistant.shared.addingSpacerForLine(&componentsOfPage, widthScreen: width)
@@ -78,7 +77,7 @@ extension PageInteractor: PageInteractorInputProtocol {
     
     
     func provideNextPageData() {
-        if currentPage <= pages.count {
+        if currentPage < pages.count - 1 {
             currentPage += 1
             providePageData(with: widthScreen)
         }

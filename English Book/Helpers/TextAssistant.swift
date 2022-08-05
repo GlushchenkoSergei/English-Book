@@ -16,7 +16,7 @@ class TextAssistant {
         DispatchQueue.global().async {
             var pagesOfBook: [String] = []
             
-            let diverseCount = Int(text.count / 400)
+            let diverseCount = Int(text.count / 380)
             var location = 0
             
             let valueOnePercent = CGFloat(100)/CGFloat(diverseCount)
@@ -25,10 +25,10 @@ class TextAssistant {
             for _ in 0..<diverseCount - 1 {
                 
                 pagesOfBook.append(String(
-                    text[text.index(text.startIndex, offsetBy: location)..<text.index(text.startIndex, offsetBy: location + 400)]
+                    text[text.index(text.startIndex, offsetBy: location)..<text.index(text.startIndex, offsetBy: location + 380)]
                 ))
                 
-                location += 400
+                location += 380
                 counter += 1
                 
                 DispatchQueue.main.async {
@@ -59,30 +59,30 @@ class TextAssistant {
     }
     
     func addingSpacerForLine(_ componentsOfPage: inout [String], widthScreen: Double) {
-        print("_______________________________________________________")
-        let widthScreen = widthScreen - 32
-        print("Общая ширина \(widthScreen)")
+        let widthScreen = widthScreen - 33
+        
         var width: Double = 0
         var counterWidthOneLine: Double = 0
         let widthOneSpacer = CalculationWidthLabel.shared.getSizeMask(" ")
-        print("ширина пробела\(widthOneSpacer)")
         
         for index in 0...componentsOfPage.count - 1 {
 
             width += CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
             
-            if width >= widthScreen {
+            if width > widthScreen {
                 let x = (widthScreen - counterWidthOneLine) / widthOneSpacer
 
-                guard Int(x) > 0 else { return }
-
+                if Int(x) > 0 {
                 
-                for _ in 0...Int(x) - 1 {
-                    componentsOfPage[index - 1] += " "
+                    for _ in 0...Int(x) - 1 {
+                        componentsOfPage[index - 1] += " "
+                    }
+                    
                 }
                 counterWidthOneLine = 0
                 width = CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
-            }
+                }
+                
             
             counterWidthOneLine += CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
         }

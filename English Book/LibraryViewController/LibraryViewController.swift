@@ -107,8 +107,9 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
                     self?.progressView.setProgress(0, animated: true)
                     pagesOfBook = pages
                     let pageVC = PageViewController()
-                    pageVC.nameBook = book.title ?? ""
-                    pageVC.pagesOfBook = pagesOfBook
+                    
+                    let configurator: PageConfiguratorInputProtocol = PageConfigurator()
+                    configurator.configure(with: pageVC, and: pagesOfBook, nameBook: book.title ?? "")
                     self?.navigationController?.pushViewController(pageVC, animated: true)
                 })
             

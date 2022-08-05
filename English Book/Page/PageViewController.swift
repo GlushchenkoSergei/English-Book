@@ -107,12 +107,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         return button
     }()
     
-    var pagesOfBook: [String] = []
-    var nameBook = ""
-    
     var presenter: PageViewControllerOutputProtocol!
-    private let configurator: PageConfiguratorInputProtocol = PageConfigurator()
-    
     
     private var componentsOfPage: [String] = []
     private var sizesForCells: [Double] = []
@@ -124,9 +119,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configurator.configure(with: self, and: pagesOfBook, nameBook: nameBook)
         presenter.showPages(with: view.bounds.width)
-
         
         collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
         view.backgroundColor = .systemBackground
@@ -197,7 +190,6 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
             cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
         }
         
-        cell.backgroundColor = .systemGray
         return cell
     }
     
@@ -215,11 +207,15 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         
         hiddenDetailViewWord(value: false)
         
-        detailViewWord.frame.origin = setPositionDetailViewWord(locationCollectionView, locationView)
+        detailViewWord.frame.origin = PositionAssistant.shared.setPosition(
+            detailViewWord,
+            locationCollectionView,
+            locationView,
+            view
+        )
+        
         detailViewWord.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-        
         UIView.animate(withDuration: 0.2) { self.detailViewWord.transform = .identity }
-        
         originalWord.text = word
         translateWord.text = TranslateManager.translate(word: word)
     }
@@ -296,28 +292,6 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         originalWord.isHidden = value
         learnButton.isHidden = value
         iKnowButton.isHidden = value
-    }
-    
-    private func setPositionDetailViewWord(_ locationCollectionView: CGPoint, _ locationView: CGPoint) -> CGPoint {
-        
-        var valueX: CGFloat = 0
-        var valueY: CGFloat = 0
-        
-        switch locationCollectionView.x {
-        case ...CGFloat(detailViewWord.frame.width / 2):
-            valueX = locationView.x
-        case CGFloat(detailViewWord.frame.width / 2) + 1...view.bounds.width - detailViewWord.frame.width / 2:
-            valueX = locationView.x - detailViewWord.frame.width / 2
-        default:
-            valueX = locationView.x - detailViewWord.frame.width
-        }
-        
-        switch locationCollectionView.y {
-        case ...detailViewWord.frame.height:  valueY = locationView.y + 20
-        default: valueY = locationView.y - detailViewWord.bounds.height - 20
-        }
-        
-        return CGPoint(x: valueX, y: valueY)
     }
     
     private func setConstraints() {

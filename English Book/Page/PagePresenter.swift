@@ -5,7 +5,7 @@
 //  Created by mac on 04.08.2022.
 //
 
-import Foundation
+//import Foundation
 
 struct PageData {
     let componentsOfPage: [String]
@@ -24,7 +24,6 @@ class PagePresenter: PageViewControllerOutputProtocol {
     func showPages(with width: Double) {
         interactor.provideBasicInformation()
         interactor.providePageData(with: width)
-//        print("Из presenter \(width - 32)")
     }
     
     func getWordsDatabase() {

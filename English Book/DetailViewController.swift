@@ -63,7 +63,7 @@ class DetailViewController: UIViewController {
         return button
     }()
     
-    let progressMask: UIView = {
+    private let progressMask: UIView = {
         let view = UIView()
         view.backgroundColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 0.8166104752)
         view.isHidden = true
@@ -138,8 +138,10 @@ Id - [\(result.id)]
                 
                 
                 let pageVC = PageViewController()
-                pageVC.pagesOfBook = self?.pagesOfBook ?? []
-                pageVC.nameBook = self?.result.title ?? ""
+                
+                let configurator: PageConfiguratorInputProtocol = PageConfigurator()
+                configurator.configure(with: pageVC, and: pagesOfBook, nameBook: self?.result.title ?? "")
+                
                 self?.navigationController?.pushViewController(pageVC, animated: true) }
         )
     }

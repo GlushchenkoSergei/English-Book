@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		043F2C5E289D685000BBB3F9 /* PositionAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043F2C5D289D685000BBB3F9 /* PositionAssistant.swift */; };
 		047441E9288B0F5D0098414B /* listWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 047441E8288B0F5D0098414B /* listWords.txt */; };
 		047441EB288B0FE40098414B /* TranslateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047441EA288B0FE40098414B /* TranslateManager.swift */; };
 		0477C3522882BD9E0013C5A3 /* LibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */; };
@@ -37,6 +38,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		043F2C5D289D685000BBB3F9 /* PositionAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionAssistant.swift; sourceTree = "<group>"; };
 		047441E8288B0F5D0098414B /* listWords.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = listWords.txt; path = ../../../../../listWords.txt; sourceTree = "<group>"; };
 		047441EA288B0FE40098414B /* TranslateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateManager.swift; sourceTree = "<group>"; };
 		0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewController.swift; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 			children = (
 				04ADFA1A288C1CBF003AB6AA /* TextAssistant.swift */,
 				04C0CB0F289C3CAE00DBB89C /* CalculationWidthLabel.swift */,
+				043F2C5D289D685000BBB3F9 /* PositionAssistant.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -142,9 +145,6 @@
 		049559EC287C68F000B482F8 /* English Book */ = {
 			isa = PBXGroup;
 			children = (
-				0482F0B228815F0400EB5F62 /* Sistem */,
-				0482F0B128815EF500EB5F62 /* Model */,
-				0477C3552882C5DB0013C5A3 /* Helpers */,
 				049F0CB828896E4A0061538C /* StartTabBarController.swift */,
 				049F0CB5288943170061538C /* LibraryViewController */,
 				049F0CBA28896F5E0061538C /* DictionaryTableViewController.swift */,
@@ -152,21 +152,23 @@
 				0482F0AD28815A8700EB5F62 /* SearchViewController.swift */,
 				0482F0B8288187DD00EB5F62 /* DetailViewController.swift */,
 				04C0CB08289C041E00DBB89C /* Page */,
+				0482F0B128815EF500EB5F62 /* Model */,
 				04A8717628888D9B00A719DD /* StorageManager */,
 				0482F0B328815F6D00EB5F62 /* NetworkManage */,
+				0477C3552882C5DB0013C5A3 /* Helpers */,
+				0482F0B228815F0400EB5F62 /* Sistem */,
 				049559F6287C68F200B482F8 /* Assets.xcassets */,
 				049559F8287C68F200B482F8 /* LaunchScreen.storyboard */,
 			);
 			path = "English Book";
 			sourceTree = "<group>";
 		};
-		049F0CB4288942DD0061538C /* PageViewController */ = {
+		049F0CB4288942DD0061538C /* WordCollectionViewCell */ = {
 			isa = PBXGroup;
 			children = (
-				049559F1287C68F000B482F8 /* PageViewController.swift */,
 				04A8B4DC287D90060012A9E1 /* WordCollectionViewCell.swift */,
 			);
-			path = PageViewController;
+			path = WordCollectionViewCell;
 			sourceTree = "<group>";
 		};
 		049F0CB5288943170061538C /* LibraryViewController */ = {
@@ -190,7 +192,8 @@
 		04C0CB08289C041E00DBB89C /* Page */ = {
 			isa = PBXGroup;
 			children = (
-				049F0CB4288942DD0061538C /* PageViewController */,
+				049F0CB4288942DD0061538C /* WordCollectionViewCell */,
+				049559F1287C68F000B482F8 /* PageViewController.swift */,
 				04C0CB09289C118200DBB89C /* PagePresenter.swift */,
 				04C0CB0B289C11B600DBB89C /* PageInteractor.swift */,
 				04C0CB0D289C150900DBB89C /* PageConfigurator.swift */,
@@ -351,6 +354,7 @@
 				04C0CB0C289C11B600DBB89C /* PageInteractor.swift in Sources */,
 				049559EE287C68F000B482F8 /* AppDelegate.swift in Sources */,
 				04C0CB10289C3CAE00DBB89C /* CalculationWidthLabel.swift in Sources */,
+				043F2C5E289D685000BBB3F9 /* PositionAssistant.swift in Sources */,
 				0482F0B9288187DD00EB5F62 /* DetailViewController.swift in Sources */,
 				04A8717A28888DEB00A719DD /* StorageManager.swift in Sources */,
 			);
