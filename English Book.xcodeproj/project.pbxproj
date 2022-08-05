@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		042F1C7D289D9A3200F1E0A7 /* listWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 042F1C7C289D9A3200F1E0A7 /* listWords.txt */; };
 		043F2C5E289D685000BBB3F9 /* PositionAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043F2C5D289D685000BBB3F9 /* PositionAssistant.swift */; };
-		047441E9288B0F5D0098414B /* listWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 047441E8288B0F5D0098414B /* listWords.txt */; };
 		047441EB288B0FE40098414B /* TranslateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047441EA288B0FE40098414B /* TranslateManager.swift */; };
 		0477C3522882BD9E0013C5A3 /* LibraryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */; };
 		0482F0AC28815A0900EB5F62 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 0482F0AB28815A0900EB5F62 /* .gitignore */; };
@@ -38,8 +38,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		042F1C7C289D9A3200F1E0A7 /* listWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = listWords.txt; sourceTree = "<group>"; };
 		043F2C5D289D685000BBB3F9 /* PositionAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionAssistant.swift; sourceTree = "<group>"; };
-		047441E8288B0F5D0098414B /* listWords.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = listWords.txt; path = ../../../../../listWords.txt; sourceTree = "<group>"; };
 		047441EA288B0FE40098414B /* TranslateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateManager.swift; sourceTree = "<group>"; };
 		0477C3512882BD9E0013C5A3 /* LibraryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewController.swift; sourceTree = "<group>"; };
 		0482F0AB28815A0900EB5F62 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
@@ -105,7 +105,7 @@
 		0482F0B228815F0400EB5F62 /* Sistem */ = {
 			isa = PBXGroup;
 			children = (
-				047441E8288B0F5D0098414B /* listWords.txt */,
+				042F1C7C289D9A3200F1E0A7 /* listWords.txt */,
 				049559ED287C68F000B482F8 /* AppDelegate.swift */,
 				049559FB287C68F200B482F8 /* Info.plist */,
 				0482F0AB28815A0900EB5F62 /* .gitignore */,
@@ -278,8 +278,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				047441E9288B0F5D0098414B /* listWords.txt in Resources */,
 				049559FA287C68F200B482F8 /* LaunchScreen.storyboard in Resources */,
+				042F1C7D289D9A3200F1E0A7 /* listWords.txt in Resources */,
 				0482F0AC28815A0900EB5F62 /* .gitignore in Resources */,
 				049559F7287C68F200B482F8 /* Assets.xcassets in Resources */,
 			);
