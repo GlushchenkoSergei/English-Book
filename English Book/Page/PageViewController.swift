@@ -71,6 +71,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         let label = UILabel()
         label.text = "originalWord"
         label.isHidden = true
+        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 20)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -80,6 +81,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         let label = UILabel()
         label.text = "translateWord"
         label.isHidden = true
+        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -89,7 +91,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let iKnowButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 0.4650824338)
+        button.backgroundColor = #colorLiteral(red: 0.5622143149, green: 0.9348329306, blue: 0.3373457193, alpha: 0.4650824338)
         button.setTitle("Знаю", for: .normal)
         button.setTitleColor(UIColor.black, for: .normal)
         button.isHidden = true
@@ -183,11 +185,11 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
                       sizeMask: CalculationWidthLabel.shared.getSizeMask(word))
         
         let containerIKnow = iKnowTheseWords.filter { $0.word == word }
-        cell.maskTextView.backgroundColor = !containerIKnow.isEmpty ? #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
-        
+        cell.maskTextView.backgroundColor = !containerIKnow.isEmpty ? UIColor(named: "maskGreen") : UIColor(named: "maskWord")
+
         if containerIKnow.isEmpty {
             let containerLearn = learnTheseWords.filter { $0.word == word }
-            cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
+            cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : UIColor(named: "maskWord")
         }
         
         return cell
