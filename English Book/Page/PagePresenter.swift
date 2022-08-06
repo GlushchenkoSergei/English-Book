@@ -14,6 +14,7 @@ struct PageData {
 
 class PagePresenter: PageViewControllerOutputProtocol {
     
+    
     unowned let view: PageViewControllerInputProtocol
     var interactor: PageInteractorInputProtocol!
     
@@ -38,6 +39,13 @@ class PagePresenter: PageViewControllerOutputProtocol {
         interactor.provideBackPageData()
     }
     
+    func selectionPage(number: String?) {
+        print("из презентора")
+        guard let numberInt = Int(number ?? "") else { return }
+        print("из презентора \(numberInt)")
+        interactor.provideSelectedPage(number: numberInt)
+    }
+    
 }
 
 extension PagePresenter: PageInteractorOutputProtocol {
@@ -47,9 +55,11 @@ extension PagePresenter: PageInteractorOutputProtocol {
         view.displayNumberOfPages(with: String(countPages))
     }
     
-    func receivePageData(with pageData: PageData) {
+    func receivePageData(with pageData: PageData, page: Int) {
         view.getComponentsOfPage(with: pageData.componentsOfPage)
         view.getArrayWidthCell(sizesForCells: pageData.sizesForCells)
+        view.reloadData()
+        view.displayCurrentPage(String(page))
     }
     
     func receiveWordsDatabase(iKnowTheseWords: [WordIKnow], learnTheseWords: [LearnWord]) {

@@ -14,6 +14,8 @@ protocol PageViewControllerInputProtocol: AnyObject {
     func displayNumberOfPages(with count: String)
     func displayWordsIKnow(iKnowTheseWords: [WordIKnow])
     func displayWordsLearn(learnTheseWords: [LearnWord])
+    func displayCurrentPage(_ page: String)
+    func reloadData()
 }
 
 protocol PageViewControllerOutputProtocol: AnyObject {
@@ -22,6 +24,7 @@ protocol PageViewControllerOutputProtocol: AnyObject {
     func getWordsDatabase()
     func nextButtonPressed()
     func backButtonPressed()
+    func selectionPage(number: String?)
 }
 
 
@@ -47,6 +50,15 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         label.font = UIFont.systemFont(ofSize: 10)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private let currentPageButton: UIButton = {
+        let button = UIButton()
+        button.setTitleColor(UIColor.systemGray, for: .normal)
+        button.setTitle("5 стр.", for: .normal)
+        button.layer.cornerRadius = 5
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     private let backPageButton: UIButton = {
@@ -135,6 +147,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addSubview(backPageButton)
         view.addSubview(allPagesLabel)
         view.addSubview(detailViewWord)
+        view.addSubview(currentPageButton)
         
         detailViewWord.addSubview(translateWord)
         detailViewWord.addSubview(originalWord)
@@ -149,6 +162,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
         iKnowButton.addTarget(self, action: #selector(iKnowButtonTap), for: .touchUpInside)
         learnButton.addTarget(self, action: #selector(learnButtonTap), for: .touchUpInside)
+        currentPageButton.addTarget(self, action: #selector(currentPageButtonTap), for: .touchUpInside)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -159,12 +173,26 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     @objc private func nextPageButtonTap() {
         presenter.nextButtonPressed()
-        collectionView.reloadData()
+    }
+    
+    @objc private func currentPageButtonTap() {
+        let alert = UIAlertController(title: "Выберети страницу", message: "", preferredStyle: .alert)
+        alert.addTextField()
+        alert.textFields?.first?.placeholder = "1 - 100"
+        alert.textFields?.first?.keyboardType = .numberPad
+        
+        
+        let action = UIAlertAction(title: "перейти", style: .cancel) { _ in
+            self.presenter.selectionPage(number: alert.textFields?.first?.text)
+        }
+        
+        alert.addAction(action)
+        
+        present(alert, animated: true)
     }
     
     @objc private func backPageButtonTap() {
         presenter.backButtonPressed()
-        collectionView.reloadData()
     }
     
 }
@@ -298,22 +326,28 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     private func setConstraints() {
         
         NSLayoutConstraint.activate([
-            allPagesLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
+            currentPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 20),
+            currentPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            currentPageButton.widthAnchor.constraint(equalToConstant: 100)
+        ])
+        
+        NSLayoutConstraint.activate([
+            allPagesLabel.bottomAnchor.constraint(equalTo: currentPageButton.bottomAnchor, constant: 5),
             allPagesLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         
         NSLayoutConstraint.activate([
-            nextPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
+            nextPageButton.centerYAnchor.constraint(equalTo: currentPageButton.centerYAnchor),
             nextPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 100),
-            nextPageButton.heightAnchor.constraint(equalToConstant: 30),
-            nextPageButton.widthAnchor.constraint(equalToConstant: 30)
+            nextPageButton.heightAnchor.constraint(equalToConstant: 40),
+            nextPageButton.widthAnchor.constraint(equalToConstant: 40)
         ])
         
         NSLayoutConstraint.activate([
-            backPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
+            backPageButton.centerYAnchor.constraint(equalTo: currentPageButton.centerYAnchor),
             backPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -100),
-            backPageButton.heightAnchor.constraint(equalToConstant: 30),
-            backPageButton.widthAnchor.constraint(equalToConstant: 30)
+            backPageButton.heightAnchor.constraint(equalToConstant: 40),
+            backPageButton.widthAnchor.constraint(equalToConstant: 40)
         ])
         
         NSLayoutConstraint.activate([
@@ -389,6 +423,10 @@ extension PageViewController: PageViewControllerInputProtocol {
         self.componentsOfPage = components
     }
     
+    func displayCurrentPage(_ page: String) {
+        currentPageButton.setTitle(page, for: .normal)
+    }
+    
     func getArrayWidthCell(sizesForCells: [Double]) {
         self.sizesForCells = sizesForCells
     }
@@ -399,6 +437,10 @@ extension PageViewController: PageViewControllerInputProtocol {
     
     func displayWordsLearn(learnTheseWords: [LearnWord]) {
         self.learnTheseWords = learnTheseWords
+    }
+    
+    func reloadData() {
+        collectionView.reloadData()
     }
     
 }

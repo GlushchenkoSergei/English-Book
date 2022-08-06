@@ -15,11 +15,12 @@ protocol PageInteractorInputProtocol: AnyObject {
     func provideNextPageData()
     func provideBackPageData()
     func provideWordsDatabase()
+    func provideSelectedPage(number: Int)
 }
 
 protocol PageInteractorOutputProtocol: AnyObject {
     func receiveNameBook(with name: String, countPages: Int)
-    func receivePageData(with nameData: PageData)
+    func receivePageData(with nameData: PageData, page: Int)
     func receiveWordsDatabase(iKnowTheseWords: [WordIKnow], learnTheseWords: [LearnWord])
 }
 
@@ -50,8 +51,7 @@ class PageInteractor {
 }
 
 extension PageInteractor: PageInteractorInputProtocol {
-    
-    
+   
     func provideBasicInformation() {
         presenter.receiveNameBook(with: nameBook, countPages: pages.count)
     }
@@ -65,7 +65,8 @@ extension PageInteractor: PageInteractorInputProtocol {
         
         let pageData = PageData(componentsOfPage: componentsOfPage, sizesForCells: sizesForCells)
         
-        presenter.receivePageData(with: pageData)
+        presenter.receivePageData(with: pageData, page: currentPage + 1)
+//        presenter
     }
     
     func provideWordsDatabase() {
@@ -89,5 +90,14 @@ extension PageInteractor: PageInteractorInputProtocol {
             providePageData(with: widthScreen)
         }
     }
+    
+    func provideSelectedPage(number: Int) {
+        print("из интерактора \(number)")
+        if number > 0 && number <= pages.count {
+            currentPage = number - 1
+            providePageData(with: widthScreen)
+        }
+    }
+    
     
 }
