@@ -65,8 +65,7 @@ class LibraryViewController: UIViewController {
 extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print(books.count)
-        return books.count + 1
+      books.count + 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -97,7 +96,7 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
             let book = books[indexPath.row - 1]
             var pagesOfBook: [String] = []
             
-            TextSeparationAssistant.divideTextIntoPages(
+            TextAssistant.shared.divideTextIntoPages(
                 text: book.body ?? "",
                 progress: { progress in
                     self.progressView.setProgress(Float(progress/100), animated: true)
@@ -107,8 +106,9 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
                     self?.progressView.setProgress(0, animated: true)
                     pagesOfBook = pages
                     let pageVC = PageViewController()
-                    pageVC.nameBook = book.title ?? ""
-                    pageVC.pagesOfBook = pagesOfBook
+                    
+                    let configurator: PageConfiguratorInputProtocol = PageConfigurator()
+                    configurator.configure(with: pageVC, and: pagesOfBook, nameBook: book.title ?? "")
                     self?.navigationController?.pushViewController(pageVC, animated: true)
                 })
             

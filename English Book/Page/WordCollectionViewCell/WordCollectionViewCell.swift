@@ -12,9 +12,10 @@ class WordCollectionViewCell: UICollectionViewCell {
     static let identifier = "WordCollectionViewCell"
     var sizeMask = 0.0
     
-    let textLabel: UILabel = {
+   private let textLabel: UILabel = {
         let label = UILabel()
         label.text = "text"
+        label.textColor = UIColor(named: "textPage")
         label.font = UIFont.monospacedSystemFont(ofSize: 17, weight: .black)
         return label
     }()

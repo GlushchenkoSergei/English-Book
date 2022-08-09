@@ -9,7 +9,7 @@ import UIKit
 
 class DictionaryTableViewController: UITableViewController {
     
-    var learnTheseWords: [LearnWord] = []
+   private var learnTheseWords: [LearnWord] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()

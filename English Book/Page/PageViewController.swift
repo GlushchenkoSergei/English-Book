@@ -7,12 +7,32 @@
 
 import UIKit
 
+protocol PageViewControllerInputProtocol: AnyObject {
+    func displayTitleBook(with title: String)
+    func getComponentsOfPage(with components: [String])
+    func getArrayWidthCell(sizesForCells: [Double])
+    func displayNumberOfPages(with count: String)
+    func displayWordsIKnow(iKnowTheseWords: [WordIKnow])
+    func displayWordsLearn(learnTheseWords: [LearnWord])
+    func displayCurrentPage(_ page: String)
+    func reloadData()
+}
+
+protocol PageViewControllerOutputProtocol: AnyObject {
+    init(view: PageViewControllerInputProtocol)
+    func showPages(with width: Double)
+    func getWordsDatabase()
+    func nextButtonPressed()
+    func backButtonPressed()
+    func selectionPage(number: String?)
+}
+
+
 class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-//        collectionView.isScrollEnabled = false
         return collectionView
     }()
     
@@ -32,6 +52,15 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         return label
     }()
     
+    private let currentPageButton: UIButton = {
+        let button = UIButton()
+        button.setTitleColor(UIColor.systemGray, for: .normal)
+        button.setTitle("5 стр.", for: .normal)
+        button.layer.cornerRadius = 5
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     private let backPageButton: UIButton = {
         let button = UIButton()
         button.tintColor = .systemGray2
@@ -42,7 +71,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let detailViewWord: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray2
+        view.backgroundColor = UIColor(named: "maskWord")
         view.clipsToBounds = true
         view.layer.cornerRadius = 20
         view.layer.borderWidth = 1
@@ -52,8 +81,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let originalWord: UILabel = {
         let label = UILabel()
-        label.text = "originalWord"
         label.isHidden = true
+        label.textColor = UIColor(named: "textPage")
         label.font = UIFont.systemFont(ofSize: 20)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -61,8 +90,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let translateWord: UILabel = {
         let label = UILabel()
-        label.text = "translateWord"
         label.isHidden = true
+        label.textColor = UIColor(named: "textPage")
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -72,9 +101,9 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let iKnowButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 0.4650824338)
+        button.backgroundColor = #colorLiteral(red: 0.5622143149, green: 0.9348329306, blue: 0.3373457193, alpha: 0.4650824338)
         button.setTitle("Знаю", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(UIColor(named: "textPage"), for: .normal)
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -84,33 +113,13 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         let button = UIButton()
         button.backgroundColor = #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.4541427915)
         button.setTitle("Учить", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(UIColor(named: "textPage"), for: .normal)
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    var pagesOfBook: [String] = []
-    var nameBook = ""
-    
-    // Для подсчета ширины cell
-    private let labelForCountingWidthCell: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.monospacedSystemFont(ofSize: 17, weight: .black)
-        return label
-    }()
-   
-    private var currentPage = 1 {
-        didSet{
-            componentsOfPage = divisionIntoParts(this: pagesOfBook[currentPage - 1])
-            addingSpacerForLine()
-            createArrayWidthCell()
-            collectionView.reloadData()
-        }
-    }
-    
-    private var value = 0
-    private var counterOneLine = 0
+    var presenter: PageViewControllerOutputProtocol!
     
     private var componentsOfPage: [String] = []
     private var sizesForCells: [Double] = []
@@ -122,99 +131,69 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        presenter.showPages(with: view.bounds.width)
+        
         collectionView.register(WordCollectionViewCell.self, forCellWithReuseIdentifier: WordCollectionViewCell.identifier)
-        title = nameBook
         view.backgroundColor = .systemBackground
         let testGesture = UITapGestureRecognizer(target: self, action: #selector(tapGestureCollectionView(sender: )))
         collectionView.addGestureRecognizer(testGesture)
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        allPagesLabel.text = "\(pagesOfBook.count) страниц."
-        
         view.addSubview(collectionView)
         view.addSubview(nextPageButton)
         view.addSubview(backPageButton)
         view.addSubview(allPagesLabel)
         view.addSubview(detailViewWord)
+        view.addSubview(currentPageButton)
         
         detailViewWord.addSubview(translateWord)
         detailViewWord.addSubview(originalWord)
         detailViewWord.addSubview(iKnowButton)
         detailViewWord.addSubview(learnButton)
-
+        
         detailViewWord.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: view.bounds.height / 5)
         
         setConstraints()
-        componentsOfPage = divisionIntoParts(this: pagesOfBook[currentPage - 1])
-        addingSpacerForLine()
-        createArrayWidthCell()
         
         nextPageButton.addTarget(self, action: #selector(nextPageButtonTap), for: .touchUpInside)
         backPageButton.addTarget(self, action: #selector(backPageButtonTap), for: .touchUpInside)
         iKnowButton.addTarget(self, action: #selector(iKnowButtonTap), for: .touchUpInside)
         learnButton.addTarget(self, action: #selector(learnButtonTap), for: .touchUpInside)
+        currentPageButton.addTarget(self, action: #selector(currentPageButtonTap), for: .touchUpInside)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        iKnowTheseWords = StorageManager.shared.fetchWordsIKnow() ?? []
-        learnTheseWords = StorageManager.shared.fetchLearnWords() ?? []
+        presenter.getWordsDatabase()
         collectionView.reloadData()
     }
     
     @objc private func nextPageButtonTap() {
-        if currentPage < pagesOfBook.count { currentPage += 1 }
+        presenter.nextButtonPressed()
+    }
+    
+    @objc private func currentPageButtonTap() {
+        showAlert()
     }
     
     @objc private func backPageButtonTap() {
-        if currentPage != 1 { currentPage -= 1 }
+        presenter.backButtonPressed()
     }
     
-    private func createArrayWidthCell() {
-        sizesForCells.removeAll()
-        for component in componentsOfPage {
-            labelForCountingWidthCell.text = component
-            labelForCountingWidthCell.sizeToFit()
-            sizesForCells.append(labelForCountingWidthCell.frame.width)
-        }
-    }
-    
-    private func addingSpacerForLine() {
+   private func showAlert() {
+        let alert = UIAlertController(title: "Выберети страницу", message: "", preferredStyle: .alert)
+        alert.addTextField()
+        alert.textFields?.first?.placeholder = "от 1 - до \(allPagesLabel.text ?? "")"
+        alert.textFields?.first?.keyboardType = .numberPad
         
-        for index in 0...componentsOfPage.count - 1 {
-            
-            value += componentsOfPage[index].count
-            
-            if value > 31 {
-                let x = 31 - counterOneLine
-                guard x > 0 else { return }
-                for _ in 0...x {
-                    componentsOfPage[index - 1] += " "
-                }
-                counterOneLine = 0
-                value = componentsOfPage[index].count
-            }
-            counterOneLine += componentsOfPage[index].count
+        let action = UIAlertAction(title: "перейти", style: .cancel) { _ in
+            self.presenter.selectionPage(number: alert.textFields?.first?.text)
         }
+        
+        alert.addAction(action)
+        present(alert, animated: true)
     }
-    
-    private func divisionIntoParts(this text: String) -> [String] {
-        var components: [String] = []
-        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .byWords) { _, _, enclosingRange, _ in
-            components.append(String(text[enclosingRange]))
-        }
-        return components
-    }
-    
-    private func removePunctuationMarks(this text: String) -> String {
-        var string: String = ""
-        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: .byWords) { _, substringRange, _, _ in
-            string = String(text[substringRange])
-        }
-        return string
-    }
-    
     
 }
 
@@ -228,27 +207,20 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WordCollectionViewCell.identifier, for: indexPath) as! WordCollectionViewCell
         
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
-        cell.configure(with: componentsOfPage[indexPath.row], sizeMask: getSizeMask(text: word))
+        let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         
+        cell.configure(with: componentsOfPage[indexPath.row],
+                      sizeMask: CalculationWidthLabel.shared.getSizeMask(word))
         
         let containerIKnow = iKnowTheseWords.filter { $0.word == word }
-        cell.maskTextView.backgroundColor = !containerIKnow.isEmpty ? #colorLiteral(red: 0.5390633941, green: 0.8859668374, blue: 0.3078767955, alpha: 1) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
-        
+        cell.maskTextView.backgroundColor = !containerIKnow.isEmpty ? UIColor(named: "maskGreen") : UIColor(named: "maskWord")
+
         if containerIKnow.isEmpty {
-        let containerLearn = learnTheseWords.filter { $0.word == word }
-        cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : #colorLiteral(red: 0.825511992, green: 0.825511992, blue: 0.825511992, alpha: 1)
+            let containerLearn = learnTheseWords.filter { $0.word == word }
+            cell.maskTextView.backgroundColor = !containerLearn.isEmpty ? #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.8955446963) : UIColor(named: "maskWord")
         }
         
-//        cell.backgroundColor = .systemGray
         return cell
-    }
-    
-    func getSizeMask(text: String) -> Double {
-        labelForCountingWidthCell.text = text
-        labelForCountingWidthCell.sizeToFit()
-        let size = labelForCountingWidthCell.frame.width
-        return size
     }
     
     // MARK: - Modified testTapGesture of CollectionView
@@ -256,18 +228,23 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         
         let locationView = sender.location(in: view)
         let locationCollectionView = sender.location(in: collectionView)
-
+        
         guard let indexPath = collectionView.indexPathForItem(at: locationCollectionView) else { return }
         indexPathItem = indexPath
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        
+        let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         
         hiddenDetailViewWord(value: false)
-
-        detailViewWord.frame.origin = setPositionDetailViewWord(locationCollectionView, locationView)
-        detailViewWord.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
         
+        detailViewWord.frame.origin = PositionAssistant.shared.setPosition(
+            detailViewWord,
+            locationCollectionView,
+            locationView,
+            view
+        )
+        
+        detailViewWord.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
         UIView.animate(withDuration: 0.2) { self.detailViewWord.transform = .identity }
-
         originalWord.text = word
         translateWord.text = TranslateManager.translate(word: word)
     }
@@ -276,7 +253,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     @objc private func iKnowButtonTap() {
         guard let indexPath = indexPathItem else { return }
         
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         var isContains = false
         
         for wordLearn in learnTheseWords {
@@ -298,11 +275,11 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
             }
         }
         
-            if !isContains {
-        guard let wordCoreData = StorageManager.shared.appendIKnowWord(title: word) else { return }
-        iKnowTheseWords.append(wordCoreData)
+        if !isContains {
+            guard let wordCoreData = StorageManager.shared.appendIKnowWord(title: word) else { return }
+            iKnowTheseWords.append(wordCoreData)
         }
-    
+        
         collectionView.reloadData()
         hiddenDetailViewWord(value: true)
     }
@@ -310,7 +287,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     @objc private func learnButtonTap() {
         guard let indexPath = indexPathItem else { return }
         
-        let word = removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
+        let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         let containerLearn = learnTheseWords.filter { $0.word == word }
         
         
@@ -346,76 +323,31 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         iKnowButton.isHidden = value
     }
     
-    private func setPositionDetailViewWord(_ locationCollectionView: CGPoint, _ locationView: CGPoint) -> CGPoint {
-        
-        var valueX: CGFloat = 0
-        var valueY: CGFloat = 0
-        
-        switch locationCollectionView.x {
-        case ...CGFloat(detailViewWord.frame.width / 2):
-            valueX = locationView.x
-        case CGFloat(detailViewWord.frame.width / 2) + 1...view.bounds.width - detailViewWord.frame.width / 2:
-            valueX = locationView.x - detailViewWord.frame.width / 2
-        default:
-            valueX = locationView.x - detailViewWord.frame.width
-        }
-        
-        switch locationCollectionView.y {
-        case ...detailViewWord.frame.height:  valueY = locationView.y + 20
-        default: valueY = locationView.y - detailViewWord.bounds.height - 20
-        }
-        
-        return CGPoint(x: valueX, y: valueY)
-    }
-    
-}
-
-  
-// MARK: - UICollectionViewDelegateFlowLayout
-extension PageViewController: UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-    }
-    
-    //расстояние между горизонтальными секциями
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        9
-    }
-    
-    //расстояние между вертикальными разделителями
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        CGSize(width: (sizesForCells[indexPath.row]), height: 30)
-    }
-}
-
-
-// MARK: - Set constraints
-extension PageViewController {
-    
     private func setConstraints() {
         
         NSLayoutConstraint.activate([
-            allPagesLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
+            currentPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 20),
+            currentPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            currentPageButton.widthAnchor.constraint(equalToConstant: 100)
+        ])
+        
+        NSLayoutConstraint.activate([
+            allPagesLabel.bottomAnchor.constraint(equalTo: currentPageButton.bottomAnchor, constant: 5),
             allPagesLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         
         NSLayoutConstraint.activate([
-            nextPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
+            nextPageButton.centerYAnchor.constraint(equalTo: currentPageButton.centerYAnchor),
             nextPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 100),
-            nextPageButton.heightAnchor.constraint(equalToConstant: 30),
-            nextPageButton.widthAnchor.constraint(equalToConstant: 30)
+            nextPageButton.heightAnchor.constraint(equalToConstant: 40),
+            nextPageButton.widthAnchor.constraint(equalToConstant: 40)
         ])
         
         NSLayoutConstraint.activate([
-            backPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 10),
+            backPageButton.centerYAnchor.constraint(equalTo: currentPageButton.centerYAnchor),
             backPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -100),
-            backPageButton.heightAnchor.constraint(equalToConstant: 30),
-            backPageButton.widthAnchor.constraint(equalToConstant: 30)
+            backPageButton.heightAnchor.constraint(equalToConstant: 40),
+            backPageButton.widthAnchor.constraint(equalToConstant: 40)
         ])
         
         NSLayoutConstraint.activate([
@@ -451,7 +383,64 @@ extension PageViewController {
             learnButton.widthAnchor.constraint(equalToConstant: detailViewWord.frame.width / 2),
             learnButton.bottomAnchor.constraint(equalTo: detailViewWord.bottomAnchor)
         ])
-        
+    }
+    
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout
+extension PageViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        9
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        CGSize(width: (sizesForCells[indexPath.row]), height: 30)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        0
+    }
+    
+}
+
+// MARK: - PageViewControllerInputProtocol
+extension PageViewController: PageViewControllerInputProtocol {
+    
+    func displayTitleBook(with title: String) {
+        self.title = title
+    }
+    
+    func displayNumberOfPages(with count: String) {
+        self.allPagesLabel.text = count
+    }
+    
+    func getComponentsOfPage(with components: [String]) {
+        self.componentsOfPage = components
+    }
+    
+    func displayCurrentPage(_ page: String) {
+        currentPageButton.setTitle(page, for: .normal)
+    }
+    
+    func getArrayWidthCell(sizesForCells: [Double]) {
+        self.sizesForCells = sizesForCells
+    }
+    
+    func displayWordsIKnow(iKnowTheseWords: [WordIKnow]) {
+        self.iKnowTheseWords = iKnowTheseWords
+    }
+    
+    func displayWordsLearn(learnTheseWords: [LearnWord]) {
+        self.learnTheseWords = learnTheseWords
+    }
+    
+    func reloadData() {
+        collectionView.reloadData()
     }
     
 }

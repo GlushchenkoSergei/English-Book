@@ -12,11 +12,12 @@ class TestViewController: UIViewController {
     private let viewCard: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         view.layer.cornerRadius = 15
         view.layer.shadowRadius = 15
         view.layer.shadowOpacity = 0.5
         view.layer.borderWidth = 2
+        view.layer.borderColor = UIColor.systemGray.cgColor
         view.layer.shadowOffset = CGSize(width: 0, height: 8)
         return view
     }()
@@ -51,6 +52,7 @@ class TestViewController: UIViewController {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         label.numberOfLines = 0
+//        label.textColor = .black
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -92,7 +94,7 @@ English book предлагает пройти тест,
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         view.addSubview(viewCard)
         view.addSubview(descriptionTest)

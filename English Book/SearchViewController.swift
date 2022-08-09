@@ -9,7 +9,7 @@ import UIKit
 
 class SearchViewController: UIViewController {
     
-    let backButton: UIButton = {
+   private let backButton: UIButton = {
         let button = UIButton()
         button.tintColor = .systemGray2
         button.setBackgroundImage(UIImage(systemName: "arrowshape.turn.up.backward"), for: .normal)
@@ -17,7 +17,7 @@ class SearchViewController: UIViewController {
         return button
     }()
     
-    let nextButton: UIButton = {
+    private let nextButton: UIButton = {
         let button = UIButton()
         button.tintColor = .systemGray2
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -25,7 +25,7 @@ class SearchViewController: UIViewController {
         return button
     }()
     
-    let pageCountLabel: UILabel = {
+    private let pageCountLabel: UILabel = {
         let label = UILabel()
         label.text = "Page 1"
         label.font = UIFont.boldSystemFont(ofSize: 20)
@@ -34,13 +34,13 @@ class SearchViewController: UIViewController {
         return label
     }()
     
-    let tableView: UITableView = {
+    private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
-    let activityIndicator: UIActivityIndicatorView = {
+    private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         return indicator
     }()
@@ -107,10 +107,7 @@ class SearchViewController: UIViewController {
         if search.previous != nil {
             NetworkManage.shared.fetchDataSearch(
                 url: search.previous ?? "",
-                progressDownload: { progressDownload in
-//                    self.progressView.setProgress(Float(progressDownload.fractionCompleted),
-//                                                  animated: true)
-                },
+                progressDownload: { _ in  },
                 completion: { search in
                     self.search = search
                     self.activityIndicator.stopAnimating()
@@ -128,10 +125,7 @@ class SearchViewController: UIViewController {
         if search.next != nil {
             NetworkManage.shared.fetchDataSearch(
                 url: search.next ?? "",
-                progressDownload: { progressDownload in
-//                    self.progressView.setProgress(Float(progressDownload.fractionCompleted),
-//                                                  animated: true)
-                },
+                progressDownload: { _ in},
                 completion: {
                     search in self.search = search
                     self.activityIndicator.stopAnimating()

@@ -63,7 +63,7 @@ class DetailViewController: UIViewController {
         return button
     }()
     
-    let progressMask: UIView = {
+    private let progressMask: UIView = {
         let view = UIView()
         view.backgroundColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 0.8166104752)
         view.isHidden = true
@@ -82,6 +82,7 @@ class DetailViewController: UIViewController {
     }
     var pagesOfBook: [String] = []
     var finishDiverse = false
+    let dowloadedBooks = StorageManager.shared.fetchDataBook()
     
     var delegateLibrary: LibraryViewControllerDelegate!
     
@@ -91,7 +92,17 @@ class DetailViewController: UIViewController {
         view.backgroundColor = .systemBackground
         title = result.title
         
-        if checkZip(string: result.formats.textPlainCharsetUtf8) {
+        checkDownloaded(result.title) { body, isHave in
+            if !isHave {
+                guard let body = body else { return }
+                mainText = body
+                openPageVCButton.isHidden = false
+                downloadButton.isHidden = true
+            }
+        }
+        
+        
+        if checkTxt(string: result.formats.textPlainCharsetUtf8) {
             downloadButton.isEnabled = true
             downloadButton.backgroundColor = .blue
         } else {
@@ -122,7 +133,7 @@ Id - [\(result.id)]
         progressMask.isHidden = false
         openPageVCButton.backgroundColor = .white
         
-        TextSeparationAssistant.divideTextIntoPages(
+        TextAssistant.shared.divideTextIntoPages(
             text: mainText,
             progress: { [weak self] progress in
                 self?.progressMask.frame = CGRect(
@@ -138,8 +149,10 @@ Id - [\(result.id)]
                 
                 
                 let pageVC = PageViewController()
-                pageVC.pagesOfBook = self?.pagesOfBook ?? []
-                pageVC.nameBook = self?.result.title ?? ""
+                
+                let configurator: PageConfiguratorInputProtocol = PageConfigurator()
+                configurator.configure(with: pageVC, and: pagesOfBook, nameBook: self?.result.title ?? "")
+                
                 self?.navigationController?.pushViewController(pageVC, animated: true) }
         )
     }
@@ -172,10 +185,21 @@ Id - [\(result.id)]
         }
     }
     
-    private func checkZip(string: String?) -> Bool {
+    private func checkTxt(string: String?) -> Bool {
         guard let stringURL = result.formats.textPlainCharsetUtf8 else { return false}
         print(stringURL)
         return stringURL.contains(".txt") ? true : false
+    }
+    
+    private func checkDownloaded(_ book: String, completion: (String?, Bool) -> ()) {
+        var boolValue = false
+        
+        dowloadedBooks?.forEach { bookCD in
+            if bookCD.title == book {
+                boolValue.toggle()
+                completion(bookCD.body, boolValue)
+            }
+        }
     }
     
     private func setImage() {
