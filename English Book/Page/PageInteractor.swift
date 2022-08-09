@@ -92,7 +92,6 @@ extension PageInteractor: PageInteractorInputProtocol {
     }
     
     func provideSelectedPage(number: Int) {
-        print("из интерактора \(number)")
         if number > 0 && number <= pages.count {
             currentPage = number - 1
             providePageData(with: widthScreen)

@@ -71,7 +71,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let detailViewWord: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray2
+        view.backgroundColor = UIColor(named: "maskWord")
         view.clipsToBounds = true
         view.layer.cornerRadius = 20
         view.layer.borderWidth = 1
@@ -81,9 +81,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let originalWord: UILabel = {
         let label = UILabel()
-        label.text = "originalWord"
         label.isHidden = true
-        label.textColor = .black
+        label.textColor = UIColor(named: "textPage")
         label.font = UIFont.systemFont(ofSize: 20)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -91,9 +90,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let translateWord: UILabel = {
         let label = UILabel()
-        label.text = "translateWord"
         label.isHidden = true
-        label.textColor = .black
+        label.textColor = UIColor(named: "textPage")
         label.font = UIFont.systemFont(ofSize: 14)
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -105,7 +103,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         let button = UIButton()
         button.backgroundColor = #colorLiteral(red: 0.5622143149, green: 0.9348329306, blue: 0.3373457193, alpha: 0.4650824338)
         button.setTitle("Знаю", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(UIColor(named: "textPage"), for: .normal)
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -115,7 +113,7 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         let button = UIButton()
         button.backgroundColor = #colorLiteral(red: 0.411550343, green: 0.1191236749, blue: 0.7548881769, alpha: 0.4541427915)
         button.setTitle("Учить", for: .normal)
-        button.setTitleColor(UIColor.black, for: .normal)
+        button.setTitleColor(UIColor(named: "textPage"), for: .normal)
         button.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -176,23 +174,25 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @objc private func currentPageButtonTap() {
+        showAlert()
+    }
+    
+    @objc private func backPageButtonTap() {
+        presenter.backButtonPressed()
+    }
+    
+   private func showAlert() {
         let alert = UIAlertController(title: "Выберети страницу", message: "", preferredStyle: .alert)
         alert.addTextField()
-        alert.textFields?.first?.placeholder = "1 - 100"
+        alert.textFields?.first?.placeholder = "от 1 - до \(allPagesLabel.text ?? "")"
         alert.textFields?.first?.keyboardType = .numberPad
-        
         
         let action = UIAlertAction(title: "перейти", style: .cancel) { _ in
             self.presenter.selectionPage(number: alert.textFields?.first?.text)
         }
         
         alert.addAction(action)
-        
         present(alert, animated: true)
-    }
-    
-    @objc private func backPageButtonTap() {
-        presenter.backButtonPressed()
     }
     
 }

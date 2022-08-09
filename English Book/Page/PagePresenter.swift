@@ -40,9 +40,7 @@ class PagePresenter: PageViewControllerOutputProtocol {
     }
     
     func selectionPage(number: String?) {
-        print("из презентора")
         guard let numberInt = Int(number ?? "") else { return }
-        print("из презентора \(numberInt)")
         interactor.provideSelectedPage(number: numberInt)
     }
     
