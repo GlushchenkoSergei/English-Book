@@ -14,24 +14,24 @@ class PositionAssistant {
     
     func setPosition(_ view: UIView, _ locationCollection: CGPoint, _ locationView: CGPoint, _ mainView: UIView) -> CGPoint {
         
-        var x: CGFloat = 0
-        var y: CGFloat = 0
+        var positionX: CGFloat = 0
+        var positionY: CGFloat = 0
         
         switch locationCollection.x {
         case ...CGFloat(view.frame.width / 2):
-            x = locationView.x
+            positionX = locationView.x
         case CGFloat(view.frame.width / 2) + 1...mainView.bounds.width - view.frame.width / 2:
-            x = locationView.x - view.frame.width / 2
+            positionX = locationView.x - view.frame.width / 2
         default:
-            x = locationView.x - view.frame.width
+            positionX = locationView.x - view.frame.width
         }
         
         switch locationCollection.y {
-        case ...view.frame.height:  y = locationView.y + 20
-        default: y = locationView.y - view.bounds.height - 20
+        case ...view.frame.height: positionY = locationView.y + 20
+        default: positionY = locationView.y - view.bounds.height - 20
         }
         
-        return CGPoint(x: x, y: y)
+        return CGPoint(x: positionX, y: positionY)
     }
     
 }

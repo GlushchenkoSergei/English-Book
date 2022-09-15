@@ -12,7 +12,6 @@ class NetworkManage {
     static let shared = NetworkManage()
     private init() {}
     
-
     func fetchDataSearch(url: String, progressDownload: @escaping(Progress) -> Void, completion: @escaping(Search) -> Void) {
         request(url)
             .downloadProgress(closure: { progress in

@@ -11,14 +11,12 @@ protocol PageConfiguratorInputProtocol {
 
 class PageConfigurator: PageConfiguratorInputProtocol {
     
-    
     func configure(with view: PageViewController, and pagesOfBook: [String], nameBook: String) {
         let presenter = PagePresenter(view: view)
         let interactor = PageInteractor(presenter: presenter, nameBook: nameBook, pages: pagesOfBook)
-
+        
         view.presenter = presenter
         presenter.interactor = interactor
     }
-    
     
 }

@@ -63,7 +63,6 @@ class SearchViewController: UIViewController {
         view.addSubview(tableView)
         view.addSubview(pageCountLabel)
 
-        
         activityIndicator.center = view.center
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
@@ -89,7 +88,7 @@ class SearchViewController: UIViewController {
         
         NetworkManage.shared.fetchDataSearch(
             url: LinK.searchBooks.rawValue,
-            progressDownload: { progressDownload in
+            progressDownload: { _ in
 //                self.progressView.setProgress(Float(progressDownload.fractionCompleted),
 //                                              animated: true)
             },
@@ -126,8 +125,8 @@ class SearchViewController: UIViewController {
             NetworkManage.shared.fetchDataSearch(
                 url: search.next ?? "",
                 progressDownload: { _ in},
-                completion: {
-                    search in self.search = search
+                completion: { search in
+                    self.search = search
                     self.activityIndicator.stopAnimating()
                     self.tableView.isHidden = false
                     self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
@@ -188,7 +187,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         content.secondaryText = search.results?[indexPath.row].authors?.first?.name
         
         if let url = search.results?[indexPath.row].formats.imageJPEG {
-            NetworkManage.shared.fetchDataFrom(url: url) { progress in
+            NetworkManage.shared.fetchDataFrom(url: url) { _ in
                 
             } completion: { data in
                 content.image = UIImage(data: data)
@@ -207,6 +206,5 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         detailVC.result = search.results?[indexPath.row]
         navigationController?.pushViewController(detailVC, animated: true)
     }
-    
     
 }

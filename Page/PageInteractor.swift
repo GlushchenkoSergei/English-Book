@@ -5,8 +5,6 @@
 //  Created by mac on 04.08.2022.
 //
 
-//import Foundation
-
 protocol PageInteractorInputProtocol: AnyObject {
     var currentPage: Int { get set }
     init(presenter: PageInteractorOutputProtocol, nameBook: String, pages: [String])
@@ -24,7 +22,7 @@ protocol PageInteractorOutputProtocol: AnyObject {
     func receiveWordsDatabase(iKnowTheseWords: [WordIKnow], learnTheseWords: [LearnWord])
 }
 
-// MARK: -  Interactor
+// MARK: - Interactor
 class PageInteractor {
     
     unowned let presenter: PageInteractorOutputProtocol!
@@ -32,7 +30,7 @@ class PageInteractor {
     var nameBook: String!
     var pages: [String]!
     var widthScreen: Double = 0
-    
+
     var currentPage: Int {
         get {
             StorageManager.shared.getCurrentPageOf(book: nameBook)
@@ -47,15 +45,15 @@ class PageInteractor {
         self.nameBook = nameBook
         self.pages = pages
     }
-    
+
 }
 
 extension PageInteractor: PageInteractorInputProtocol {
-   
+    
     func provideBasicInformation() {
         presenter.receiveNameBook(with: nameBook, countPages: pages.count)
     }
-    
+
     func providePageData(with width: Double) {
         widthScreen = width
         var componentsOfPage = TextAssistant.shared.divisionIntoParts(this: pages[currentPage])
@@ -75,7 +73,6 @@ extension PageInteractor: PageInteractorInputProtocol {
         
         presenter.receiveWordsDatabase(iKnowTheseWords: iKnowTheseWords, learnTheseWords: learnTheseWords)
     }
-    
     
     func provideNextPageData() {
         if currentPage < pages.count - 1 {
@@ -97,6 +94,5 @@ extension PageInteractor: PageInteractorInputProtocol {
             providePageData(with: widthScreen)
         }
     }
-    
     
 }

@@ -70,11 +70,11 @@ class TextAssistant {
             width += CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
             
             if width > widthScreen {
-                let x = (widthScreen - counterWidthOneLine) / widthOneSpacer
+                let valueX = (widthScreen - counterWidthOneLine) / widthOneSpacer
 
-                if Int(x) > 0 {
+                if Int(valueX) > 0 {
                 
-                    for _ in 0...Int(x) - 1 {
+                    for _ in 0...Int(valueX) - 1 {
                         componentsOfPage[index - 1] += " "
                     }
                     
@@ -83,7 +83,6 @@ class TextAssistant {
                 width = CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
                 }
                 
-            
             counterWidthOneLine += CalculationWidthLabel.shared.getSizeMask(componentsOfPage[index])
         }
 

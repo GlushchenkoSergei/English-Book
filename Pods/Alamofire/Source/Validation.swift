@@ -94,8 +94,7 @@ extension Request {
         statusCode acceptableStatusCodes: S,
         response: HTTPURLResponse)
         -> ValidationResult
-        where S.Iterator.Element == Int
-    {
+        where S.Iterator.Element == Int {
         if acceptableStatusCodes.contains(response.statusCode) {
             return .success
         } else {

@@ -5,7 +5,6 @@
 //  Created by mac on 04.08.2022.
 //
 
-
 import UIKit
 
 class CalculationWidthLabel {

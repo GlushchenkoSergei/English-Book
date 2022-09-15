@@ -5,15 +5,12 @@
 //  Created by mac on 04.08.2022.
 //
 
-//import Foundation
-
 struct PageData {
     let componentsOfPage: [String]
     let sizesForCells: [Double]
 }
 
 class PagePresenter: PageViewControllerOutputProtocol {
-    
     
     unowned let view: PageViewControllerInputProtocol
     var interactor: PageInteractorInputProtocol!

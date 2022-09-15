@@ -55,7 +55,5 @@ class CollectionMyLibraryCell: UICollectionViewCell {
         imageViewBook.image = UIImage(named: namedImage)
         nameBookLabel.text = title
     }
-    
-    
-}
 
+}

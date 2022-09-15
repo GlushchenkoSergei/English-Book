@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol LibraryViewControllerDelegate {
+protocol LibraryViewControllerDelegate: AnyObject {
     func savedNewBook()
 }
 
@@ -115,7 +115,7 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
         }
     }
     
-    //Размер ячеек
+    // Размер ячеек
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         CGSize(width: (view.frame.width / 3) - 30, height: view.frame.height / 5)
     }
@@ -158,5 +158,3 @@ extension LibraryViewController: LibraryViewControllerDelegate {
     }
     
 }
-
-

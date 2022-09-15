@@ -27,7 +27,6 @@ protocol PageViewControllerOutputProtocol: AnyObject {
     func selectionPage(number: String?)
 }
 
-
 class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let collectionView: UICollectionView = {
@@ -249,31 +248,26 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         translateWord.text = TranslateManager.translate(word: word)
     }
     
-    
     @objc private func iKnowButtonTap() {
         guard let indexPath = indexPathItem else { return }
         
         let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         var isContains = false
         
-        for wordLearn in learnTheseWords {
-            if wordLearn.word == word {
+        for wordLearn in learnTheseWords where wordLearn.word == word {
                 StorageManager.shared.delete(wordLearn)
                 let indexFind = learnTheseWords.firstIndex(of: wordLearn)
                 learnTheseWords.remove(at: indexFind ?? 0)
                 break
             }
-        }
         
-        for wordIKnow in iKnowTheseWords {
-            if wordIKnow.word == word {
+        for wordIKnow in iKnowTheseWords where wordIKnow.word == word {
                 StorageManager.shared.delete(wordIKnow)
                 let indexFind = iKnowTheseWords.firstIndex(of: wordIKnow)
                 iKnowTheseWords.remove(at: indexFind ?? 0)
                 isContains = true
                 break
             }
-        }
         
         if !isContains {
             guard let wordCoreData = StorageManager.shared.appendIKnowWord(title: word) else { return }
@@ -290,15 +284,12 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         let word = TextAssistant.shared.removePunctuationMarks(this: componentsOfPage[indexPath.row].lowercased())
         let containerLearn = learnTheseWords.filter { $0.word == word }
         
-        
-        for wordIKnow in iKnowTheseWords {
-            if wordIKnow.word == word {
+        for wordIKnow in iKnowTheseWords where wordIKnow.word == word {
                 StorageManager.shared.delete(wordIKnow)
                 let indexFind = iKnowTheseWords.firstIndex(of: wordIKnow)
                 iKnowTheseWords.remove(at: indexFind ?? 0)
                 break
             }
-        }
         
         if !containerLearn.isEmpty {
             StorageManager.shared.delete(containerLearn.first!)
@@ -324,7 +315,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
     }
     
     private func setConstraints() {
-        
+
         NSLayoutConstraint.activate([
             currentPageButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(tabBarController?.tabBar.frame.height ?? 0) - 20),
             currentPageButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -371,7 +362,7 @@ extension PageViewController: UICollectionViewDataSource, UICollectionViewDelega
         ])
         
         NSLayoutConstraint.activate([
-            iKnowButton.heightAnchor.constraint(equalToConstant:  detailViewWord.frame.height / 4),
+            iKnowButton.heightAnchor.constraint(equalToConstant: detailViewWord.frame.height / 4),
             iKnowButton.leadingAnchor.constraint(equalTo: detailViewWord.leadingAnchor),
             iKnowButton.widthAnchor.constraint(equalToConstant: detailViewWord.frame.width / 2),
             iKnowButton.bottomAnchor.constraint(equalTo: detailViewWord.bottomAnchor)
@@ -444,4 +435,3 @@ extension PageViewController: PageViewControllerInputProtocol {
     }
     
 }
-

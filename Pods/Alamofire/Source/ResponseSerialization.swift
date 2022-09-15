@@ -110,6 +110,7 @@ extension DataRequest {
     /// - parameter completionHandler: The code to be executed once the request has finished.
     ///
     /// - returns: The request.
+    @available(iOS 10.0, *)
     @discardableResult
     public func response(queue: DispatchQueue? = nil, completionHandler: @escaping (DefaultDataResponse) -> Void) -> Self {
         delegate.queue.addOperation {
@@ -218,8 +219,7 @@ extension DownloadRequest {
         queue: DispatchQueue? = nil,
         responseSerializer: T,
         completionHandler: @escaping (DownloadResponse<T.SerializedObject>) -> Void)
-        -> Self
-    {
+        -> Self {
         delegate.queue.addOperation {
             let result = responseSerializer.serializeResponse(
                 self.request,
@@ -532,8 +532,7 @@ extension DataRequest {
         queue: DispatchQueue? = nil,
         options: JSONSerialization.ReadingOptions = .allowFragments,
         completionHandler: @escaping (DataResponse<Any>) -> Void)
-        -> Self
-    {
+        -> Self {
         return response(
             queue: queue,
             responseSerializer: DataRequest.jsonResponseSerializer(options: options),
@@ -551,8 +550,7 @@ extension DownloadRequest {
     /// - returns: A JSON object response serializer.
     public static func jsonResponseSerializer(
         options: JSONSerialization.ReadingOptions = .allowFragments)
-        -> DownloadResponseSerializer<Any>
-    {
+        -> DownloadResponseSerializer<Any> {
         return DownloadResponseSerializer { _, response, fileURL, error in
             guard error == nil else { return .failure(error!) }
 
@@ -580,8 +578,7 @@ extension DownloadRequest {
         queue: DispatchQueue? = nil,
         options: JSONSerialization.ReadingOptions = .allowFragments,
         completionHandler: @escaping (DownloadResponse<Any>) -> Void)
-        -> Self
-    {
+        -> Self {
         return response(
             queue: queue,
             responseSerializer: DownloadRequest.jsonResponseSerializer(options: options),

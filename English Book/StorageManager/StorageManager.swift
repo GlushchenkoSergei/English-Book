@@ -17,7 +17,7 @@ class StorageManager {
     
     private let persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "English Book")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        container.loadPersistentStores(completionHandler: { (_, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
@@ -62,7 +62,6 @@ class StorageManager {
             return nil
         }
     }
-    
     
     func appendIKnowWord(title: String) -> WordIKnow? {
         guard let entityDescription = NSEntityDescription.entity(forEntityName: "WordIKnow", in: context) else { return nil }

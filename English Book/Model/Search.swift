@@ -45,6 +45,3 @@ struct Formats: Codable {
     }
     
 }
-
-
-

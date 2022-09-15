@@ -46,7 +46,7 @@ class DictionaryTableViewController: UITableViewController {
   
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         let wordCD = learnTheseWords[indexPath.row]
-        let _ = StorageManager.shared.appendIKnowWord(title: wordCD.word ?? "")
+        _ = StorageManager.shared.appendIKnowWord(title: wordCD.word ?? "")
         
         StorageManager.shared.delete(wordCD)
         learnTheseWords.remove(at: indexPath.row)

@@ -5,6 +5,7 @@ target 'English Book' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
        pod 'Alamofire'
+       pod 'SwiftLint'
   # Pods for English Book
 
 end

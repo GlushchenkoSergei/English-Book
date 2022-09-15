@@ -15,7 +15,6 @@ class DetailViewController: UIViewController {
     private let imageBook: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-//        imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 5
         imageView.layer.shadowRadius = 9
@@ -101,7 +100,6 @@ class DetailViewController: UIViewController {
             }
         }
         
-        
         if checkTxt(string: result.formats.textPlainCharsetUtf8) {
             downloadButton.isEnabled = true
             downloadButton.backgroundColor = .blue
@@ -147,7 +145,6 @@ Id - [\(result.id)]
             completion: { [weak self] pagesOfBook in
                 self?.pagesOfBook = pagesOfBook
                 
-                
                 let pageVC = PageViewController()
                 
                 let configurator: PageConfiguratorInputProtocol = PageConfigurator()
@@ -191,7 +188,7 @@ Id - [\(result.id)]
         return stringURL.contains(".txt") ? true : false
     }
     
-    private func checkDownloaded(_ book: String, completion: (String?, Bool) -> ()) {
+    private func checkDownloaded(_ book: String, completion: (String?, Bool) -> Void) {
         var boolValue = false
         
         dowloadedBooks?.forEach { bookCD in

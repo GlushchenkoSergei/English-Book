@@ -177,22 +177,19 @@ English book предлагает пройти тест,
         },
                     completion: {
             self.myProgress.text = "Вы выучили \( self.iKnowWords.count) сл."
-            let _ = StorageManager.shared.appendLearnWord(title: self.wordEn)
+            _ = StorageManager.shared.appendLearnWord(title: self.wordEn)
             self.wordEn = self.labelWord.text ?? ""
         })
-        
         
     }
    
     private func deleteWordFromIKnow() {
         
-        for iKnowWord in iKnowWords {
-            if iKnowWord.word == wordEn {
-                StorageManager.shared.delete(iKnowWord)
-                let indexFind = iKnowWords.firstIndex(of: iKnowWord)
-                iKnowWords.remove(at: indexFind ?? 0)
-                break
-            }
+        for iKnowWord in iKnowWords where iKnowWord.word == wordEn {
+            StorageManager.shared.delete(iKnowWord)
+            let indexFind = iKnowWords.firstIndex(of: iKnowWord)
+            iKnowWords.remove(at: indexFind ?? 0)
+            break
         }
         
     }
@@ -205,7 +202,7 @@ English book предлагает пройти тест,
         })
     }
     
-    private func animateSwipe(start position: CGFloat, completionAfterHide: @escaping () -> (), completion: @escaping () -> ()) {
+    private func animateSwipe(start position: CGFloat, completionAfterHide: @escaping () -> Void, completion: @escaping () -> Void) {
         
         UIView.animate(withDuration: 0.2,
                        animations: {
@@ -268,8 +265,8 @@ extension TestViewController {
         ])
         
         NSLayoutConstraint.activate([
-            myProgress.bottomAnchor.constraint(equalTo: descriptionTest.topAnchor, constant: -10) ,
-            myProgress.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            myProgress.bottomAnchor.constraint(equalTo: descriptionTest.topAnchor, constant: -10),
+            myProgress.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
         ])
         
         NSLayoutConstraint.activate([
@@ -288,5 +285,3 @@ extension TestViewController {
         
     }
 }
-
-
