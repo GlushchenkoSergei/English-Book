@@ -54,6 +54,7 @@ class SearchViewController: UIViewController {
     }
     
     var delegate: LibraryViewControllerDelegate!
+    private let networkManager: NetworkManageProtocol = NetworkManage()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -86,15 +87,21 @@ class SearchViewController: UIViewController {
     
     private func downloadData() {
         
-        NetworkManage.shared.fetchDataSearch(
+        networkManager.fetchDataSearch(
             url: LinK.searchBooks.rawValue,
             progressDownload: { _ in
 //                self.progressView.setProgress(Float(progressDownload.fractionCompleted),
 //                                              animated: true)
             },
             completion: { search in
-                self.search = search
-                self.activityIndicator.stopAnimating()
+                switch search {
+                case .success(let data):
+                    self.search = data
+                    self.activityIndicator.stopAnimating()
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+                
             }
         )
         
@@ -104,14 +111,19 @@ class SearchViewController: UIViewController {
         tableView.isHidden = true
         activityIndicator.startAnimating()
         if search.previous != nil {
-            NetworkManage.shared.fetchDataSearch(
+            networkManager.fetchDataSearch(
                 url: search.previous ?? "",
                 progressDownload: { _ in  },
                 completion: { search in
-                    self.search = search
-                    self.activityIndicator.stopAnimating()
-                    self.tableView.isHidden = false
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    switch search {
+                    case .success(let data):
+                        self.search = data
+                        self.activityIndicator.stopAnimating()
+                        self.tableView.isHidden = false
+                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
                 }
             )
             
@@ -122,14 +134,20 @@ class SearchViewController: UIViewController {
         tableView.isHidden = true
         activityIndicator.startAnimating()
         if search.next != nil {
-            NetworkManage.shared.fetchDataSearch(
+            networkManager.fetchDataSearch(
                 url: search.next ?? "",
                 progressDownload: { _ in},
                 completion: { search in
-                    self.search = search
-                    self.activityIndicator.stopAnimating()
-                    self.tableView.isHidden = false
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    switch search {
+                    case .success(let data):
+                        self.search = data
+                        self.activityIndicator.stopAnimating()
+                        self.tableView.isHidden = false
+                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                    
                 }
             )
             
@@ -187,7 +205,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         content.secondaryText = search.results?[indexPath.row].authors?.first?.name
         
         if let url = search.results?[indexPath.row].formats.imageJPEG {
-            NetworkManage.shared.fetchDataFrom(url: url) { _ in
+            networkManager.fetchDataFrom(url: url) { _ in
                 
             } completion: { data in
                 content.image = UIImage(data: data)

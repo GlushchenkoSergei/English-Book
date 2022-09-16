@@ -34,6 +34,7 @@ class LibraryViewController: UIViewController {
         return progressView
     }()
     
+    private let networkManager: NetworkManageProtocol = NetworkManage()
     var books: [BookCoreData] = []
     
     override func viewDidLoad() {
@@ -76,7 +77,7 @@ extension LibraryViewController: UICollectionViewDelegate, UICollectionViewDataS
             cell.configure(with: "searchBook", title: "Search")
         } else {
             guard let imageURL = books[indexPath.row - 1].image else { return UICollectionViewCell() }
-            NetworkManage.shared.fetchResponseFrom(url: imageURL) { response in
+            networkManager.fetchResponseFrom(url: imageURL) { response in
                 cell.configure(with: response.data, title: self.books[indexPath.row - 1].title ?? "")
             }
         }

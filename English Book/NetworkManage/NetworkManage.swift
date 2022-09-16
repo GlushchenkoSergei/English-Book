@@ -8,22 +8,41 @@
 import Foundation
 import Alamofire
 
-class NetworkManage {
-    static let shared = NetworkManage()
-    private init() {}
+protocol NetworkManageProtocol {
+    func fetchDataSearch(
+        url: String,
+        progressDownload: @escaping(Progress) -> Void,
+        completion: @escaping(Swift.Result<Search, NetworkError>) -> Void
+    )
+    func fetchDataFrom(
+        url: String,
+        progressDownload: @escaping(Progress) -> Void,
+        completion: @escaping(Data) -> Void
+    )
+    func fetchResponseFrom(
+        url: String,
+        completion: @escaping(DefaultDataResponse) -> Void
+    )
+}
+
+class NetworkManage: NetworkManageProtocol {
     
-    func fetchDataSearch(url: String, progressDownload: @escaping(Progress) -> Void, completion: @escaping(Search) -> Void) {
+    func fetchDataSearch(url: String, progressDownload: @escaping(Progress) -> Void, completion: @escaping(Swift.Result<Search, NetworkError>) -> Void) {
         request(url)
             .downloadProgress(closure: { progress in
                 progressDownload(progress)
             })
             .response { response in
-                guard let data = response.data else { return }
+                guard let data = response.data else {
+                    completion(.failure(NetworkError.noData))
+                    
+                    return
+                }
                 do {
                     let cocktails = try JSONDecoder().decode(Search.self, from: data)
-                        completion(cocktails)
+                    completion(.success(cocktails))
                 } catch {
-                    print(error.localizedDescription)
+                    completion(.failure(NetworkError.decodingError))
                 }
             }
     }

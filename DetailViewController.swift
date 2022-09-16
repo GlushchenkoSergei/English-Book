@@ -84,6 +84,7 @@ class DetailViewController: UIViewController {
     let dowloadedBooks = StorageManager.shared.fetchDataBook()
     
     var delegateLibrary: LibraryViewControllerDelegate!
+    private let networkManager: NetworkManageProtocol = NetworkManage()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -160,7 +161,7 @@ Id - [\(result.id)]
         downloadButton.setTitle("0 % завершенно", for: .normal)
         
         guard let url = result.formats.textPlainCharsetUtf8 else { return }
-        NetworkManage.shared.fetchDataFrom(url: url) { progress in
+        networkManager.fetchDataFrom(url: url) { progress in
             self.progressMask.frame = CGRect(x: 0,
                                            y: 0,
                                            width: self.downloadButton.frame.width * CGFloat(progress.fractionCompleted),
@@ -201,7 +202,7 @@ Id - [\(result.id)]
     
     private func setImage() {
         guard let url = result.formats.imageJPEG else { return }
-        NetworkManage.shared.fetchResponseFrom(url: url) { response in
+        networkManager.fetchResponseFrom(url: url) { response in
             if let data = response.data {
                 self.imageBook.image = UIImage(data: data)
             }
