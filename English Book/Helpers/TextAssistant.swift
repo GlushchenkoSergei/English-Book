@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TextAssistant {
+final class TextAssistant {
     static let shared = TextAssistant()
     private init() {}
     

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class TranslateManager {
+final class TranslateManager {
     
     static func translate(word: String) -> String? {
         guard let filePath = Bundle.main.path(forResource: "listWords", ofType: "txt") else { return nil}

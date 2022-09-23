@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TestViewController: UIViewController {
+final class TestViewController: UIViewController {
     
     private let viewCard: UIView = {
         let view = UIView()
@@ -96,11 +96,7 @@ English book предлагает пройти тест,
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
-        view.addSubview(viewCard)
-        view.addSubview(descriptionTest)
-        view.addSubview(myProgress)
-        view.addSubview(resultImageLeading)
-        view.addSubview(resultImageTrailing)
+        view.addSubviews(viewCard, descriptionTest, myProgress, resultImageLeading, resultImageTrailing)
         viewCard.addSubview(labelWord)
         
         let gestureForViewCard = UITapGestureRecognizer(target: self, action: #selector(flipViewCard(sender: )))

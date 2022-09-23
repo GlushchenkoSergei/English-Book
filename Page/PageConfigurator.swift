@@ -9,7 +9,7 @@ protocol PageConfiguratorInputProtocol {
     func configure(with view: PageViewController, and pagesOfBook: [String], nameBook: String)
 }
 
-class PageConfigurator: PageConfiguratorInputProtocol {
+final class PageConfigurator: PageConfiguratorInputProtocol {
     
     func configure(with view: PageViewController, and pagesOfBook: [String], nameBook: String) {
         let presenter = PagePresenter(view: view)

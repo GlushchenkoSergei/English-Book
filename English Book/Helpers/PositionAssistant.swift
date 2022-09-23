@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PositionAssistant {
+final class PositionAssistant {
     static let shared = PositionAssistant()
     
     private init() {}

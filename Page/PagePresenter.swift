@@ -10,7 +10,7 @@ struct PageData {
     let sizesForCells: [Double]
 }
 
-class PagePresenter: PageViewControllerOutputProtocol {
+final class PagePresenter: PageViewControllerOutputProtocol {
     
     unowned let view: PageViewControllerInputProtocol
     var interactor: PageInteractorInputProtocol!

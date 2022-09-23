@@ -11,7 +11,7 @@ protocol LibraryViewControllerDelegate: AnyObject {
     func savedNewBook()
 }
 
-class LibraryViewController: UIViewController {
+final class LibraryViewController: UIViewController {
     
     private let bottomLabelView: UIView = {
         let view = UIView()
@@ -24,6 +24,7 @@ class LibraryViewController: UIViewController {
     
     private let collectionMyLibrary: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.register(CollectionMyLibraryCell.self, forCellWithReuseIdentifier: CollectionMyLibraryCell.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -42,13 +43,10 @@ class LibraryViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         title = "Библиотека"
         view.backgroundColor = .systemBackground
-        collectionMyLibrary.register(CollectionMyLibraryCell.self, forCellWithReuseIdentifier: CollectionMyLibraryCell.identifier)
         collectionMyLibrary.dataSource = self
         collectionMyLibrary.delegate = self
 
-        view.addSubview(bottomLabelView)
-        view.addSubview(collectionMyLibrary)
-        view.addSubview(progressView)
+        view.addSubviews(bottomLabelView, collectionMyLibrary, progressView)
         progressView.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: 50)
         progressView.center = view.center
         

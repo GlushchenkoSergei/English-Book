@@ -25,7 +25,7 @@ protocol NetworkManageProtocol {
     )
 }
 
-class NetworkManage: NetworkManageProtocol {
+final class NetworkManage: NetworkManageProtocol {
     
     func fetchDataSearch(url: String, progressDownload: @escaping(Progress) -> Void, completion: @escaping(Swift.Result<Search, NetworkError>) -> Void) {
         request(url)

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class DetailViewController: UIViewController {
+final class DetailViewController: UIViewController {
     
     var result: Result!
     
@@ -116,11 +116,8 @@ Id - [\(result.id)]
    Дата рождения: \(result.authors?.first?.birth_year ?? 0)
    Death date: \(result.authors?.first?.death_year ?? 0)
 """
-        view.addSubview(imageBook)
-        view.addSubview(labelBook)
-        view.addSubview(downloadButton)
-        view.addSubview(openPageVCButton)
-        view.addSubview(progressMask)
+        
+        view.addSubviews(imageBook, labelBook, downloadButton, openPageVCButton, progressMask)
         
         downloadButton.addTarget(self, action: #selector(downloadButtonAction), for: .touchUpInside)
         openPageVCButton.addTarget(self, action: #selector(openPageVCButtonAction), for: .touchUpInside)

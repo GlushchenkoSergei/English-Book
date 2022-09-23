@@ -23,7 +23,7 @@ protocol PageInteractorOutputProtocol: AnyObject {
 }
 
 // MARK: - Interactor
-class PageInteractor {
+final class PageInteractor {
     
     unowned let presenter: PageInteractorOutputProtocol!
     

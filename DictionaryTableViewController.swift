@@ -7,7 +7,7 @@
 
 import UIKit
 
-class DictionaryTableViewController: UITableViewController {
+final class DictionaryTableViewController: UITableViewController {
     
    private var learnTheseWords: [LearnWord] = []
     

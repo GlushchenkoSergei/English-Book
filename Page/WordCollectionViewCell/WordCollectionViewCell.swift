@@ -7,7 +7,7 @@
 
 import UIKit
 
-class WordCollectionViewCell: UICollectionViewCell {
+final class WordCollectionViewCell: UICollectionViewCell {
     
     static let identifier = "WordCollectionViewCell"
     var sizeMask = 0.0

@@ -7,7 +7,7 @@
 
 import CoreData
 
-class StorageManager {
+final class StorageManager {
     static let shared = StorageManager()
     
     // MARK: - Core Data stack
@@ -116,13 +116,10 @@ class StorageManager {
     
     // MARK: - User defaults
     func getCurrentPageOf(book name: String) -> Int {
-//        let userDefaults = UserDefaults.standard
-        let value = UserDefaults.standard.integer(forKey: name)
-        return value
+       UserDefaults.standard.integer(forKey: name)
     }
     
     func setCurrentPageOf(book name: String, page: Int) {
-//        let userDefaults = UserDefaults.standard
         UserDefaults.standard.set(page, forKey: name)
     }
     

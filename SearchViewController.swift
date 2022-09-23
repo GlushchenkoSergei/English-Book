@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SearchViewController: UIViewController {
+final class SearchViewController: UIViewController {
     
    private let backButton: UIButton = {
         let button = UIButton()
@@ -37,6 +37,8 @@ class SearchViewController: UIViewController {
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.rowHeight = 80
         return tableView
     }()
     
@@ -59,20 +61,13 @@ class SearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         downloadData()
-        view.addSubview(nextButton)
-        view.addSubview(backButton)
-        view.addSubview(tableView)
-        view.addSubview(pageCountLabel)
+        view.addSubviews(nextButton, backButton, tableView, pageCountLabel, activityIndicator)
 
         activityIndicator.center = view.center
-        view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
         
         view.backgroundColor = .systemBackground
         
-        tableView.rowHeight = 80
-        
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.delegate = self
         tableView.dataSource = self
         

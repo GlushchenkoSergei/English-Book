@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CalculationWidthLabel {
+final class CalculationWidthLabel {
     static let shared = CalculationWidthLabel()
     
     // Для подсчета ширины cell

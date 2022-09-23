@@ -27,7 +27,7 @@ protocol PageViewControllerOutputProtocol: AnyObject {
     func selectionPage(number: String?)
 }
 
-class PageViewController: UIViewController, UIGestureRecognizerDelegate {
+final class PageViewController: UIViewController, UIGestureRecognizerDelegate {
     
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -139,17 +139,8 @@ class PageViewController: UIViewController, UIGestureRecognizerDelegate {
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        view.addSubview(collectionView)
-        view.addSubview(nextPageButton)
-        view.addSubview(backPageButton)
-        view.addSubview(allPagesLabel)
-        view.addSubview(detailViewWord)
-        view.addSubview(currentPageButton)
-        
-        detailViewWord.addSubview(translateWord)
-        detailViewWord.addSubview(originalWord)
-        detailViewWord.addSubview(iKnowButton)
-        detailViewWord.addSubview(learnButton)
+        view.addSubviews(collectionView, nextPageButton, backPageButton, allPagesLabel, detailViewWord, currentPageButton)
+        detailViewWord.addSubviews(translateWord, originalWord, iKnowButton, learnButton)
         
         detailViewWord.frame = CGRect(x: 0, y: 0, width: view.bounds.width / 1.5, height: view.bounds.height / 5)
         
